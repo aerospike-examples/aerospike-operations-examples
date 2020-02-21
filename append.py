@@ -25,11 +25,18 @@ except ex.RecordError as e:
     pass
 
 try:
+    # create a record by upsert with a one element list
     policy = {}
-    ret = client.operate(key, [
-        list_operations.list_append("t", 1)], policy=policy)
-    print(ret[2]['t'])
-    
+    ret = client.operate(key, [list_operations.list_append("t", 1)], policy)
+    print(ret[2]["t"])
+
+    # append with an ADD_UNIQUE write flag
+    policy = {
+        "write_flags": aerospike.LIST_WRITE_ADD_UNIQUE | aerospike.LIST_WRITE_NO_FAIL,
+        "list_order": aerospike.LIST_UNORDERED,
+    }
+    ret = client.operate(key, [list_operations.list_append("t", 1)], policy)
+    print(ret[2]["t"])
 except ex.ClientError as e:
     print("Error: {0} [{1}]".format(e.msg, e.code))
 
