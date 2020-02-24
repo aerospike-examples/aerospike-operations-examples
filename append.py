@@ -3,8 +3,6 @@ from __future__ import print_function
 from args import options
 import aerospike
 from aerospike import exception as ex
-from aerospike_helpers import cdt_ctx
-from aerospike_helpers.operations import map_operations
 from aerospike_helpers.operations import list_operations
 import sys
 
@@ -26,17 +24,29 @@ except ex.RecordError as e:
 
 try:
     # create a record by upsert with a one element list
-    policy = {}
-    ret = client.operate(key, [list_operations.list_append("t", 1)], policy)
-    print(ret[2]["t"])
+    ret = client.operate(key, [list_operations.list_append("l", 1)])
+    print("The number of elements in the list is {}".format(ret[2]["l"]))
 
-    # append with an ADD_UNIQUE write flag
+    # append the same element with an ADD_UNIQUE and NO_FAIL write flags
+    # this should fail gracefully
     policy = {
         "write_flags": aerospike.LIST_WRITE_ADD_UNIQUE | aerospike.LIST_WRITE_NO_FAIL,
         "list_order": aerospike.LIST_UNORDERED,
     }
-    ret = client.operate(key, [list_operations.list_append("t", 1)], policy)
-    print(ret[2]["t"])
+    ret = client.operate(key, [list_operations.list_append("l", 1, policy)])
+    print("The number of elements in the list is {}".format(ret[2]["l"]))
+
+    # append the different element with an ADD_UNIQUE and NO_FAIL write flags
+    # this should work
+    policy = {
+        "write_flags": aerospike.LIST_WRITE_ADD_UNIQUE | aerospike.LIST_WRITE_NO_FAIL,
+        "list_order": aerospike.LIST_UNORDERED,
+    }
+    ret = client.operate(key, [list_operations.list_append("l", 2, policy)])
+    print("The number of elements in the list is {}".format(ret[2]["l"]))
+
+    k, m, b = client.get(key)
+    print("{}".format(b["l"]))
 except ex.ClientError as e:
     print("Error: {0} [{1}]".format(e.msg, e.code))
 
