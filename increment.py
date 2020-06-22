@@ -35,7 +35,7 @@ try:
 
     ops = [
         list_operations.list_set("l", 0, 1),
-        list_operations.list_append_items("l", [[3, 4]])
+        list_operations.list_append_items("l", [[3, 4]]),
     ]
     client.operate(key, ops)
     k, m, b = client.get(key)
@@ -43,10 +43,10 @@ try:
     # [1, 2.1, [3, 4]]
 
     ops = [
-            list_operations.list_increment("l", 0, 4),
-            list_operations.list_increment("l", 1, 2),
-            # the element at index 1 is 2.1. incrementing it by (integer) 2
-            # will automatically type cast the delta value to 2.0
+        list_operations.list_increment("l", 0, 4),
+        list_operations.list_increment("l", 1, 2),
+        # the element at index 1 is 2.1. incrementing it by (integer) 2
+        # will automatically type cast the delta value to 2.0
     ]
     client.operate(key, ops)
     k, m, b = client.get(key)
@@ -87,7 +87,7 @@ try:
     }
     ops = [
         list_operations.list_set_order("l", aerospike.LIST_UNORDERED),
-        list_operations.list_insert("l", 4, 2, policy)
+        list_operations.list_insert("l", 4, 2, policy),
     ]
     client.operate(key, ops)
     print("\nGracefully fails with INSERT_BOUNDED an NO_FAIL")
@@ -97,12 +97,8 @@ try:
     # it is a bit odd to use increment with ADD_UNIQUE, but it is possible
     # here we will purposefully created another list element that is the
     # integer 9, and that should throw an error
-    policy = {
-        "write_flags": aerospike.LIST_WRITE_ADD_UNIQUE
-    }
-    ops = [
-        list_operations.list_insert("l", 3, 9, policy)
-    ]
+    policy = {"write_flags": aerospike.LIST_WRITE_ADD_UNIQUE}
+    ops = [list_operations.list_insert("l", 3, 9, policy)]
     try:
         client.operate(key, ops)
     except ex.ElementExistsError as e:

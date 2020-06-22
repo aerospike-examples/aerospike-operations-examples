@@ -43,7 +43,9 @@ try:
     # adding the DO_PARTIAL policy should allow the non-repeating element to
     # be appended
     policy = {
-        "write_flags": aerospike.LIST_WRITE_ADD_UNIQUE | aerospike.LIST_WRITE_NO_FAIL | aerospike.LIST_WRITE_PARTIAL
+        "write_flags": aerospike.LIST_WRITE_ADD_UNIQUE
+        | aerospike.LIST_WRITE_NO_FAIL
+        | aerospike.LIST_WRITE_PARTIAL
     }
     client.operate(key, [list_operations.list_append_items("l", [1, [3]], policy)])
     k, m, b = client.get(key)

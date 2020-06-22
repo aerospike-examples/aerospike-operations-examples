@@ -25,16 +25,16 @@ except ex.RecordError as e:
 
 try:
     # create a record with an unordered list
-    client.put(key, {"l": [4,5,8,1,2,[3,2],9,6]})
+    client.put(key, {"l": [4, 5, 8, 1, 2, [3, 2], 9, 6]})
     k, m, b = client.get(key)
     print("{}".format(b["l"]))
     # [4, 5, 8, 1, 2, [3, 2], 9, 6]
 
     # set the inner list (at index 5) to ORDERED
-    ctx = [
-        cdt_ctx.cdt_ctx_list_index(5)
-    ]
-    client.operate(key, [list_operations.list_set_order("l", aerospike.LIST_ORDERED, ctx)])
+    ctx = [cdt_ctx.cdt_ctx_list_index(5)]
+    client.operate(
+        key, [list_operations.list_set_order("l", aerospike.LIST_ORDERED, ctx)]
+    )
     k, m, b = client.get(key)
     print("{}".format(b["l"]))
     # [4, 5, 8, 1, 2, [2, 3], 9, 6]

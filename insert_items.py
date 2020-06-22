@@ -41,10 +41,14 @@ try:
     # the ADD_UNIQUE, DO_PARTIAL and NO_FAIL write flags
     # this should gracefully skip the non-unique elements and add the new items
     policy = {
-        "write_flags": aerospike.LIST_WRITE_ADD_UNIQUE | aerospike.LIST_WRITE_NO_FAIL | aerospike.LIST_WRITE_PARTIAL,
+        "write_flags": aerospike.LIST_WRITE_ADD_UNIQUE
+        | aerospike.LIST_WRITE_NO_FAIL
+        | aerospike.LIST_WRITE_PARTIAL,
         "list_order": aerospike.LIST_UNORDERED,
     }
-    client.operate(key, [list_operations.list_insert_items("l", 4, ["a", "d", "e"], policy)])
+    client.operate(
+        key, [list_operations.list_insert_items("l", 4, ["a", "d", "e"], policy)]
+    )
     k, m, b = client.get(key)
     print("\n{}".format(b["l"]))
     # [None, 'a', 'b', 'c', 'd', 'e']
@@ -79,7 +83,9 @@ try:
 
     # insert items into the list element at index 9 of the current list
     ctx = [cdt_ctx.cdt_ctx_list_index(9)]
-    ret = client.operate(key, [list_operations.list_insert_items("l", 0, ["i", "j"], ctx=ctx)])
+    ret = client.operate(
+        key, [list_operations.list_insert_items("l", 0, ["i", "j"], ctx=ctx)]
+    )
     k, m, b = client.get(key)
     print("\n{}".format(b["l"]))
     # [None, 'a', 'b', 'c', 'd', 'e', 'f', 'g', None, ['i', 'j']]
@@ -88,7 +94,9 @@ try:
     # NO_FAIL. catch the element exists error code 24
     policy = {"write_flags": aerospike.LIST_WRITE_ADD_UNIQUE}
     try:
-        ret = client.operate(key, [list_operations.list_insert_items("l", 3, ["b", "z"], policy)])
+        ret = client.operate(
+            key, [list_operations.list_insert_items("l", 3, ["b", "z"], policy)]
+        )
     except ex.ElementExistsError as e:
         print("\nError: {0} [{1}]".format(e.msg, e.code))
         # Error: AEROSPIKE_ERR_FAIL_ELEMENT_EXISTS [24]

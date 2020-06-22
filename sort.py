@@ -25,22 +25,22 @@ except ex.RecordError as e:
 
 try:
     # create a record with an unordered list
-    client.put(key, {"l": [5,1,8,2,7,[3,2,4,1],9,6,1,2]})
+    client.put(key, {"l": [5, 1, 8, 2, 7, [3, 2, 4, 1], 9, 6, 1, 2]})
     k, m, b = client.get(key)
     print("{}".format(b["l"]))
     # [5, 1, 8, 2, 7, [3, 2, 4, 1], 9, 6, 1, 2]
 
     # sort the inner list (at index 5)
-    ctx = [
-        cdt_ctx.cdt_ctx_list_index(5)
-    ]
-    client.operate(key, [list_operations.list_sort("l",ctx=ctx)])
+    ctx = [cdt_ctx.cdt_ctx_list_index(5)]
+    client.operate(key, [list_operations.list_sort("l", ctx=ctx)])
     k, m, b = client.get(key)
     print("{}".format(b["l"]))
     # [5, 1, 8, 2, 7, [1, 2, 3, 4], 9, 6, 1, 2]
 
     # sort the outer list and drop duplicates
-    client.operate(key, [list_operations.list_sort("l", aerospike.LIST_SORT_DROP_DUPLICATES)])
+    client.operate(
+        key, [list_operations.list_sort("l", aerospike.LIST_SORT_DROP_DUPLICATES)]
+    )
     k, m, b = client.get(key)
     print("{}".format(b["l"]))
     # [1, 2, 5, 6, 7, 8, 9, [1, 2, 3, 4]]

@@ -31,10 +31,8 @@ try:
     # [1, 2, [3, 4]]
 
     # clear the inner list (at index 2)
-    ctx = [
-        cdt_ctx.cdt_ctx_list_index(2)
-    ]
-    client.operate(key, [list_operations.list_clear("l",ctx=ctx)])
+    ctx = [cdt_ctx.cdt_ctx_list_index(2)]
+    client.operate(key, [list_operations.list_clear("l", ctx=ctx)])
     k, m, b = client.get(key)
     print("{}".format(b["l"]))
     # [1, 2, []]

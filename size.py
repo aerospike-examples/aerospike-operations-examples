@@ -35,10 +35,8 @@ try:
     # The size of the list is 3
 
     # get the size of the inner list (at index 2)
-    ctx = [
-        cdt_ctx.cdt_ctx_list_index(2)
-    ]
-    k, m, b = client.operate(key, [list_operations.list_size("l",ctx=ctx)])
+    ctx = [cdt_ctx.cdt_ctx_list_index(2)]
+    k, m, b = client.operate(key, [list_operations.list_size("l", ctx=ctx)])
     print("\nThe size of the sub-list is {}".format(b["l"]))
     # The size of the sub-list is 2
 except ex.ClientError as e:
