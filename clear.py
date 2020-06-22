@@ -17,7 +17,7 @@ except ex.ClientError as e:
     print("Error: {0} [{1}]".format(e.msg, e.code))
     sys.exit(2)
 
-key = (options.namespace, options.set, "op-set_order")
+key = (options.namespace, options.set, "op-sort")
 try:
     client.remove(key)
 except ex.RecordError as e:
@@ -25,27 +25,19 @@ except ex.RecordError as e:
 
 try:
     # create a record with an unordered list
-    client.put(key, {"l": [4,5,8,1,2,[3,2],9,6]})
+    client.put(key, {"l": [1, 2, [3, 4]]})
     k, m, b = client.get(key)
     print("{}".format(b["l"]))
-    # [4, 5, 8, 1, 2, [3, 2], 9, 6]
+    # [1, 2, [3, 4]]
 
-    # set the inner list (at index 5) to ORDERED
+    # clear the inner list (at index 2)
     ctx = [
-        cdt_ctx.cdt_ctx_list_index(5)
+        cdt_ctx.cdt_ctx_list_index(2)
     ]
-    client.operate(key, [list_operations.list_set_order("l", aerospike.LIST_ORDERED, ctx)])
+    client.operate(key, [list_operations.list_clear("l",ctx=ctx)])
     k, m, b = client.get(key)
     print("{}".format(b["l"]))
-    # [4, 5, 8, 1, 2, [2, 3], 9, 6]
-
-    # set the outer list to ORDERED
-    client.operate(key, [list_operations.list_set_order("l", aerospike.LIST_ORDERED)])
-    k, m, b = client.get(key)
-    print("{}".format(b["l"]))
-    # [1, 2, 4, 5, 6, 8, 9, [2, 3]]
-    # note that list ordering puts integers elements before list elements
-    # see https://www.aerospike.com/docs/guide/cdt-ordering.html
+    # [1, 2, []]
 except ex.ClientError as e:
     print("Error: {0} [{1}]".format(e.msg, e.code))
 

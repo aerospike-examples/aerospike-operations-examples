@@ -17,48 +17,45 @@ except ex.ClientError as e:
     print("Error: {0} [{1}]".format(e.msg, e.code))
     sys.exit(2)
 
-key = (options.namespace, options.set, "op-append")
+key = (options.namespace, options.set, "op-append-items")
 try:
     client.remove(key)
 except ex.RecordError as e:
     pass
 
 try:
-    # create a new record with one element by upsert
+    # create a new record by upsert
     # by default a newly created list is unordered
-    ret = client.operate(key, [list_operations.list_append("l", 1)])
+    client.operate(key, [list_operations.list_append_items("l", [1, 2])])
     k, m, b = client.get(key)
     print("\n{}".format(b["l"]))
-    # [1]
+    # [1, 2]
 
-    # append the same element with an ADD_UNIQUE and NO_FAIL write flags
-    # this should fail gracefully
+    # append elements, one of which repeats, with an ADD_UNIQUE and NO_FAIL
+    # write flag. this should fail gracefully
     policy = {
         "write_flags": aerospike.LIST_WRITE_ADD_UNIQUE | aerospike.LIST_WRITE_NO_FAIL,
         "list_order": aerospike.LIST_UNORDERED,
     }
-    ret = client.operate(key, [list_operations.list_append("l", 1, policy)])
-    print("\nThe number of elements in the list is {}".format(ret[2]["l"]))
-    # The number of elements in the list is 1
+    client.operate(key, [list_operations.list_append_items("l", [1, 3], policy)])
+    print("\nGracefully failed on a uniqueness violation")
 
-    # append a different element with an ADD_UNIQUE and NO_FAIL write flags
-    # this should work
+    # adding the DO_PARTIAL policy should allow the non-repeating element to
+    # be appended
     policy = {
-        "write_flags": aerospike.LIST_WRITE_ADD_UNIQUE | aerospike.LIST_WRITE_NO_FAIL,
-        "list_order": aerospike.LIST_UNORDERED,
+        "write_flags": aerospike.LIST_WRITE_ADD_UNIQUE | aerospike.LIST_WRITE_NO_FAIL | aerospike.LIST_WRITE_PARTIAL
     }
-    ret = client.operate(key, [list_operations.list_append("l", [2], policy)])
+    client.operate(key, [list_operations.list_append_items("l", [1, [3]], policy)])
     k, m, b = client.get(key)
     print("\n{}".format(b["l"]))
-    # [1, [2]]
+    # [1, 2, [3]]
 
-    # append to the list element at index 1
-    ctx = [cdt_ctx.cdt_ctx_list_index(1)]
-    ret = client.operate(key, [list_operations.list_append("l", 3, ctx=ctx)])
+    # append items to the sub list at index 2
+    ctx = [cdt_ctx.cdt_ctx_list_index(2)]
+    ret = client.operate(key, [list_operations.list_append_items("l", [4, 5], ctx=ctx)])
     k, m, b = client.get(key)
     print("\n{}".format(b["l"]))
-    # [1, [2, 3]]
-
+    # [1, 2, [3,  4, 5]]
 except ex.ClientError as e:
     print("Error: {0} [{1}]".format(e.msg, e.code))
 
