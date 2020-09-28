@@ -11,14 +11,20 @@ import sys
 if options.set == "None":
     options.set = None
 
-config = {"hosts": [(options.host, options.port)]}
+config = {
+    "hosts": [(options.host, options.port)],
+    "policies": {
+        "operate": {"key": aerospike.POLICY_KEY_SEND},
+        "read": {"key": aerospike.POLICY_KEY_SEND},
+    },
+}
 try:
     client = aerospike.client(config).connect(options.username, options.password)
 except ex.ClientError as e:
     print("Error: {0} [{1}]".format(e.msg, e.code))
     sys.exit(2)
 
-key = (options.namespace, options.set, "op-increment")
+key = (options.namespace, options.set, "list-increment")
 try:
     client.remove(key)
 except ex.RecordError as e:
@@ -29,8 +35,8 @@ try:
     # a list created using increment will be unordered, regardless of the
     # list order policy
     ret = client.operate(key, [list_operations.list_increment("l", 1, 2.1)])
-    k, m, b = client.get(key)
-    print("\n{}".format(b["l"]))
+    key, metadata, bins = client.get(key)
+    print("\n{}".format(bins["l"]))
     # [None, 2.1] - Aerospike NIL represented as a Python None instance
 
     ops = [
@@ -38,8 +44,8 @@ try:
         list_operations.list_append_items("l", [[3, 4]]),
     ]
     client.operate(key, ops)
-    k, m, b = client.get(key)
-    print("\n{}".format(b["l"]))
+    key, metadata, bins = client.get(key)
+    print("\n{}".format(bins["l"]))
     # [1, 2.1, [3, 4]]
 
     ops = [
@@ -49,8 +55,8 @@ try:
         # will automatically type cast the delta value to 2.0
     ]
     client.operate(key, ops)
-    k, m, b = client.get(key)
-    print("\n{}".format(b["l"]))
+    key, metadata, bins = client.get(key)
+    print("\n{}".format(bins["l"]))
     # [5, 4.1, [3, 4]]
 
     # increment the second element of the sublist at index 2
@@ -58,8 +64,8 @@ try:
     client.operate(key, [list_operations.list_increment("l", 1, -2.0, ctx=ctx)])
     # the delta value was -2.0 and the element value was 4. the server type
     # cast the delta value into -2 to match its type to the type of the element
-    k, m, b = client.get(key)
-    print("\n{}".format(b["l"]))
+    key, metadata, bins = client.get(key)
+    print("\n{}".format(bins["l"]))
     # [5, 4.1, [3, 2]]
 
     # increment cannot be used on ordered lists
@@ -72,11 +78,11 @@ try:
         list_operations.list_increment("l", 0, 4)
         # [9, [3, 2], 4.1]
     ]
-    k, m, b = client.operate_ordered(key, ops)
-    print("\nChanging to an ordered list:\n{}".format(b[0][1]))
+    key, metadata, bins = client.operate_ordered(key, ops)
+    print("\nChanging to an ordered list:\n{}".format(bins[0][1]))
     # [5, [3, 2], 4.1]
-    k, m, b = client.get(key)
-    print("\nAfter incrementing the 0th index the list re-sorts as:\n{}".format(b["l"]))
+    key, metadata, bins = client.get(key)
+    print("\nAfter incrementing the 0th index the list re-sorts as:\n{}".format(bins["l"]))
     # [9, [3, 2], 4.1]
 
     # switch back to unordered and see the effect of incrementing outside the
@@ -91,8 +97,8 @@ try:
     ]
     client.operate(key, ops)
     print("\nGracefully fails with INSERT_BOUNDED an NO_FAIL")
-    k, m, b = client.get(key)
-    print("{}".format(b["l"]))
+    key, metadata, bins = client.get(key)
+    print("{}".format(bins["l"]))
 
     # it is a bit odd to use increment with ADD_UNIQUE, but it is possible
     # here we will purposefully created another list element that is the

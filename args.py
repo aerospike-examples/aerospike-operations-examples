@@ -22,7 +22,7 @@ argparser.add_argument(
     "-h",
     "--host",
     dest="host",
-    default="127.0.0.1",
+    default="0.0.0.0",
     metavar="<ADDRESS>",
     help="Address of Aerospike server.",
 )

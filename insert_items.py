@@ -10,14 +10,20 @@ import sys
 if options.set == "None":
     options.set = None
 
-config = {"hosts": [(options.host, options.port)]}
+config = {
+    "hosts": [(options.host, options.port)],
+    "policies": {
+        "operate": {"key": aerospike.POLICY_KEY_SEND},
+        "read": {"key": aerospike.POLICY_KEY_SEND},
+    },
+}
 try:
     client = aerospike.client(config).connect(options.username, options.password)
 except ex.ClientError as e:
     print("Error: {0} [{1}]".format(e.msg, e.code))
     sys.exit(2)
 
-key = (options.namespace, options.set, "op-insert_items")
+key = (options.namespace, options.set, "list-insert_items")
 try:
     client.remove(key)
 except ex.RecordError as e:
@@ -27,14 +33,14 @@ try:
     # create a new record by upsert
     # by default a newly created list is unordered
     client.operate(key, [list_operations.list_insert_items("l", 1, ["a", "e"])])
-    k, m, b = client.get(key)
-    print("\n{}".format(b["l"]))
+    key, metadata, bins = client.get(key)
+    print("\n{}".format(bins["l"]))
     # [None, 'a', 'e'] - Aerospike NIL represented as an instance of Python None
 
     # insert other elements into the existing list
     client.operate(key, [list_operations.list_insert_items("l", 2, ["b", "c"])])
-    k, m, b = client.get(key)
-    print("\n{}".format(b["l"]))
+    key, metadata, bins = client.get(key)
+    print("\n{}".format(bins["l"]))
     # [None, 'a', 'b', 'c', 'e']
 
     # insert a mix of existing and new items using
@@ -49,8 +55,8 @@ try:
     client.operate(
         key, [list_operations.list_insert_items("l", 4, ["a", "d", "e"], policy)]
     )
-    k, m, b = client.get(key)
-    print("\n{}".format(b["l"]))
+    key, metadata, bins = client.get(key)
+    print("\n{}".format(bins["l"]))
     # [None, 'a', 'b', 'c', 'd', 'e']
 
     # insert elements right at the boundary of the current list
@@ -61,8 +67,8 @@ try:
         | aerospike.LIST_WRITE_NO_FAIL
     }
     client.operate(key, [list_operations.list_insert_items("l", 6, ["f", "g"], policy)])
-    k, m, b = client.get(key)
-    print("\n{}".format(b["l"]))
+    key, metadata, bins = client.get(key)
+    print("\n{}".format(bins["l"]))
     # [None, 'a', 'b', 'c', 'd', 'e', 'f', 'g']
 
     # insert elements outside the boundary of the current list
@@ -77,8 +83,8 @@ try:
     # insert an element outside the boundary of the current list
     # with no INSERT_BOUNDED. this should work
     client.operate(key, [list_operations.list_insert_items("l", 9, [[]])])
-    k, m, b = client.get(key)
-    print("\n{}".format(b["l"]))
+    key, metadata, bins = client.get(key)
+    print("\n{}".format(bins["l"]))
     # [None, 'a', 'b', 'c', 'd', 'e', 'f', 'g', None, []]
 
     # insert items into the list element at index 9 of the current list
@@ -86,8 +92,8 @@ try:
     ret = client.operate(
         key, [list_operations.list_insert_items("l", 0, ["i", "j"], ctx=ctx)]
     )
-    k, m, b = client.get(key)
-    print("\n{}".format(b["l"]))
+    key, metadata, bins = client.get(key)
+    print("\n{}".format(bins["l"]))
     # [None, 'a', 'b', 'c', 'd', 'e', 'f', 'g', None, ['i', 'j']]
 
     # try to add elements, some of which already exist, using ADD_UNIQUE and no
