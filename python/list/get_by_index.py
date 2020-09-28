@@ -82,11 +82,7 @@ try:
     ctx = [cdt_ctx.cdt_ctx_list_index(-1)]
     key, metadata, bins = client.operate(
         key,
-        [
-            list_operations.list_get_by_index(
-                "l", 1, aerospike.LIST_RETURN_RANK, ctx
-            )
-        ],
+        [list_operations.list_get_by_index("l", 1, aerospike.LIST_RETURN_RANK, ctx)],
     )
     print("\n{}".format(bins["l"]))
     # 1 which is the second highest rank (in reverse rank order)
@@ -107,7 +103,7 @@ try:
     ops = [
         list_operations.list_set_order("l", aerospike.LIST_ORDERED),
         list_operations.list_get_by_index("l", 1, aerospike.LIST_RETURN_VALUE),
-        list_operations.list_get_by_index("l", -1, aerospike.LIST_RETURN_VALUE)
+        list_operations.list_get_by_index("l", -1, aerospike.LIST_RETURN_VALUE),
     ]
     key, metadata, bins = client.operate_ordered(key, ops)
     print("\n{}".format(bins[0][1]))
@@ -128,7 +124,7 @@ try:
     ctx = [cdt_ctx.cdt_ctx_list_index(-1)]
     ops = [
         list_operations.list_set_order("l", aerospike.LIST_ORDERED, ctx=ctx),
-        list_operations.list_get_by_index("l", -1, aerospike.LIST_RETURN_VALUE, ctx)
+        list_operations.list_get_by_index("l", -1, aerospike.LIST_RETURN_VALUE, ctx),
     ]
     key, metadata, bins = client.operate(key, ops)
     print("\n{}".format(bins["l"]))

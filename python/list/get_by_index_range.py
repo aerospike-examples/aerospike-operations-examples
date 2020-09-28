@@ -100,7 +100,8 @@ try:
     # try to perform a list operation on an index range outside of the current list
     try:
         key, metadata, bins = client.operate(
-            key, [listops.list_get_by_index_range("l", 7, aerospike.LIST_RETURN_VALUE), 9]
+            key,
+            [listops.list_get_by_index_range("l", 7, aerospike.LIST_RETURN_VALUE), 9],
         )
         print("\n{}".format(bins["l"]))
         # [11, [1, 3, 3, 7, 0]] - this is fine because it starts at a valid
@@ -111,8 +112,8 @@ try:
     # try again starting outside of the current list
     try:
         ops = [
-          listops.list_get_by_index_range("l", 9, aerospike.LIST_RETURN_VALUE, 3),
-          listops.list_get_by_index_range("l", 9, aerospike.LIST_RETURN_COUNT, 3)
+            listops.list_get_by_index_range("l", 9, aerospike.LIST_RETURN_VALUE, 3),
+            listops.list_get_by_index_range("l", 9, aerospike.LIST_RETURN_COUNT, 3),
         ]
         key, metadata, bins = client.operate_ordered(key, ops)
         print("\n{}".format(bins[0][1]))

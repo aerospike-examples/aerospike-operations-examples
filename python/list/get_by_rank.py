@@ -83,8 +83,10 @@ try:
     # also find the reverse index position of an element with the same rank
     ctx = [cdt_ctx.cdt_ctx_list_index(-1)]
     ops = [
-      list_operations.list_get_by_rank("l", 1, aerospike.LIST_RETURN_INDEX, ctx),
-      list_operations.list_get_by_rank("l", 1, aerospike.LIST_RETURN_REVERSE_INDEX, ctx)
+        list_operations.list_get_by_rank("l", 1, aerospike.LIST_RETURN_INDEX, ctx),
+        list_operations.list_get_by_rank(
+            "l", 1, aerospike.LIST_RETURN_REVERSE_INDEX, ctx
+        ),
     ]
     key, metadata, bins = client.operate_ordered(key, ops)
     print("\n{}".format(bins[0][1]))
@@ -109,7 +111,7 @@ try:
     ops = [
         list_operations.list_set_order("l", aerospike.LIST_ORDERED),
         list_operations.list_get_by_rank("l", 1, aerospike.LIST_RETURN_INDEX),
-        list_operations.list_get_by_rank("l", -1, aerospike.LIST_RETURN_INDEX)
+        list_operations.list_get_by_rank("l", -1, aerospike.LIST_RETURN_INDEX),
     ]
     key, metadata, bins = client.operate_ordered(key, ops)
     print("\n{}".format(bins[0][1]))

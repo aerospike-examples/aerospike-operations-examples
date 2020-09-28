@@ -80,27 +80,11 @@ try:
     print("\n{}".format(bins[2][1]))
     # [1, 4, 7, 3, 9, 9, 26, 11, [1, 3, 3, 7, 0]]
 
-    # get the 3 middle ranked elements from the list nested within the
-    # last element of the outer list, and also get the inverted sublist
-    ctx = [cdt_ctx.cdt_ctx_list_index(-1)]
-    ops = [
-        listops.list_get_by_rank_range(
-            "l", 1, aerospike.LIST_RETURN_VALUE, 3, ctx=ctx
-        ),
-        listops.list_get_by_rank_range(
-            "l", 1, aerospike.LIST_RETURN_VALUE, 3, inverted=True, ctx=ctx
-        ),
-    ]
-    key, metadata, bins = client.operate_ordered(key, ops)
-    print("\n{}".format(bins[0][1]))
-    # [3, 3, 1]
-    print("\n{}".format(bins[1][1]))
-    # [7, 0] is the inverted result list
-
     # try to perform a list operation on an index range outside of the current list
     try:
         key, metadata, bins = client.operate(
-            key, [listops.list_get_by_rank_range("l", 7, aerospike.LIST_RETURN_VALUE), 9]
+            key,
+            [listops.list_get_by_rank_range("l", 7, aerospike.LIST_RETURN_VALUE), 9],
         )
         print("\n{}".format(bins["l"]))
         # [26, [1, 3, 3, 7, 0]] - this is fine because it starts at a valid
@@ -111,8 +95,8 @@ try:
     # try again starting outside of the current list
     try:
         ops = [
-          listops.list_get_by_rank_range("l", 9, aerospike.LIST_RETURN_VALUE, 3),
-          listops.list_get_by_rank_range("l", 9, aerospike.LIST_RETURN_COUNT, 3)
+            listops.list_get_by_rank_range("l", 9, aerospike.LIST_RETURN_VALUE, 3),
+            listops.list_get_by_rank_range("l", 9, aerospike.LIST_RETURN_COUNT, 3),
         ]
         key, metadata, bins = client.operate_ordered(key, ops)
         print("\n{}".format(bins[0][1]))
@@ -127,12 +111,16 @@ try:
         listops.list_set_order("l", aerospike.LIST_ORDERED),
         operations.read("l"),
         listops.list_get_by_rank_range("l", -5, aerospike.LIST_RETURN_VALUE, 3),
+        listops.list_get_by_rank_range("l", -5, aerospike.LIST_RETURN_VALUE, 3,
+            inverted=True),
     ]
     key, metadata, bins = client.operate_ordered(key, ops)
     print("\n{}".format(bins[0][1]))
     # [1, 3, 4, 7, 9, 11, 26, [1, 3, 3, 7, 0]]
     print("\n{}".format(bins[1][1]))
     # [9, 9, 11]
+    print("\n{}".format(bins[2][1]))
+    # [1, 3, 4, 7, 26, [1, 3, 3, 7, 0]]
 
 except ex.ClientError as e:
     print("Error: {0} [{1}]".format(e.msg, e.code))
