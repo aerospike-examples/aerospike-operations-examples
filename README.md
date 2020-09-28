@@ -33,18 +33,18 @@
    Kl:c::;,'.....':c::::cccccc:;:::,.    ...,::::::;......;:;;:cldkKW           
    0:;,'....     .';:::;:::c:,.   ..      .',,,;;;:,.   ...,'.';lllox0N         
    Ko;,;codl.       ..coooooxxc.    ...    .,,'..        ..,;'';:clllldOXW      
-   WXXXNW Xc         :XWWNNNW N:    ....    ','.          .,:....';:clllokKW    
+   WXXXNW Xc         :WWX-33W N:    ....    ','.          .,:....';:clllokKW    
          Nl         ;K        Wx.........   ...            ;kkoc;...',:cllokN   
         Wd.        ,0         Wklcc:::;,,;;,'..',.       ,okN  WX0koc;'',;coK   
         Nd,.      .kW        WOlclccccccccc::::cc:.      '0         WX0koc:oK   
           NKOxo:,;kW         Xdcclllllllllllccclcdl.     .dW             WXXW   
                 WW           KocclllllllllllllllcxO,    .'dW                    
-                             KoccccccccclccllllccoK0xxk0KXW                     
-                            W0lccccccccccccccccccl0                             
-                            Nx:cccccccccccccccccclO                             
-                            Xd:cccccccccccccccccccOW                            
-                            Kl:cccccccccccccccccccxN                            
-                            0c:cccccccccccccccccc:dX                            
+                             Koccccccc clccllllccoK0xxk0KXW                     
+                            W0lcccccc    ccccccccl0                             
+                            Nx:ccccccc  ccccccccclO                             
+                             Xd:cccccc ccccccccccOW                            
+                              Kl:cccccccccccccccxN                            
+                               0c:cccccccccccc:dX                            
 
 ```
 
@@ -57,7 +57,7 @@ List Operations
 ---------------
 The [List](https://www.aerospike.com/docs/guide/cdt-list.html#list-api) operations are 18/26 complete, with examples in [Python](https://github.com/aerospike-examples/aerospike-operations-examples/tree/master/python/list).
 
-Map Operatons
+Map Operations
 -------------
 The [Map](https://www.aerospike.com/docs/guide/cdt-map.html#map-apis) operations are on the way.
 
