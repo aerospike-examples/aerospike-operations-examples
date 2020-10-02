@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import print_function
 from args import options
 import aerospike
 from aerospike import exception as ex
@@ -52,7 +51,7 @@ try:
     # operation on a specific bin, so using operate_ordered instead, which
     # gives the results as ordered (bin-name, result) tuples
     print(
-        "\nlist_remove_by_rank_range(VALUE, 6, 3)\nReturned: {}\nRemaining: {}".format(
+        "\nlist remove_by_rank_range(VALUE, 6, 3)\nReturned: {}\nRemaining: {}".format(
             bins[0][1], bins[1][1]
         )
     )
@@ -60,14 +59,14 @@ try:
     # Returned: [7, 8, 9]
     # Remaining: [1, 12, 13, 5, 4, 6, 11, 10, 2, 3]
     print(
-        "\nlist_remove_by_rank_range(COUNT, 3, 3)\nReturned: {}\nRemaining: {}".format(
+        "\nlist remove_by_rank_range(COUNT, 3, 3)\nReturned: {}\nRemaining: {}".format(
             bins[2][1], bins[3][1]
         )
     )
     # list_remove_by_rank_range(COUNT, 3, 3)
     # Returned: 3
     # Remaining: [1, 12, 13, 11, 10, 2, 3]
-    print("\nlist_remove_by_rank_range(NONE, 0, 3)\nRemaining: {}".format(bins[4][1]))
+    print("\nlist remove_by_rank_range(NONE, 0, 3)\nRemaining: {}".format(bins[4][1]))
     # list_remove_by_rank_range(NONE, 0, 3)
     # Remaining: [12, 13, 11, 10]
 

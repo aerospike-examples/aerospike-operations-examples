@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import print_function
 from args import options
 import aerospike
 from aerospike import exception as ex
