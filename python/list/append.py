@@ -29,11 +29,12 @@ except ex.RecordError as e:
     pass
 
 try:
+    print("\nappend(bin, value[, writeFlags, context])\n")
     # create a new record with one element by upsert
     # by default a newly created list is unordered
     ret = client.operate(key, [list_operations.list_append("l", 1)])
     key, metadata, bins = client.get(key)
-    print("\n{}".format(bins["l"]))
+    print("append('l', 1): {}".format(bins["l"]))
     # [1]
 
     # append the same element with an ADD_UNIQUE and NO_FAIL write flags
@@ -43,7 +44,8 @@ try:
         "list_order": aerospike.LIST_UNORDERED,
     }
     ret = client.operate(key, [list_operations.list_append("l", 1, policy)])
-    print("\nThe number of elements in the list is {}".format(ret[2]["l"]))
+    print("\nappend('l', 1, ADD_UNIQUE|NO_FAIL)")
+    print("The number of elements in the list is {}".format(ret[2]["l"]))
     # The number of elements in the list is 1
 
     # append a different element with an ADD_UNIQUE and NO_FAIL write flags
@@ -54,15 +56,15 @@ try:
     }
     ret = client.operate(key, [list_operations.list_append("l", [2], policy)])
     key, metadata, bins = client.get(key)
-    print("\n{}".format(bins["l"]))
-    # [1, [2]]
+    print("\nappend('l', [2], ADD_UNIQUE|NO_FAIL): {}".format(bins["l"]))
+    # append('l', 1, ADD_UNIQUE|NO_FAIL):[1, [2]]
 
     # append to the list element at index 1
     ctx = [cdt_ctx.cdt_ctx_list_index(1)]
     ret = client.operate(key, [list_operations.list_append("l", 3, ctx=ctx)])
     key, metadata, bins = client.get(key)
-    print("\n{}".format(bins["l"]))
-    # [1, [2, 3]]
+    print("\nappend('l', 3 context=BY_LIST_INDEX(1)): {}".format(bins["l"]))
+    # append('l', 3, context=BY_LIST_INDEX(1)): [1, [2, 3]]
 
 except ex.ClientError as e:
     print("Error: {0} [{1}]".format(e.msg, e.code))

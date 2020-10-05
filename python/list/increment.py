@@ -30,12 +30,15 @@ except ex.RecordError as e:
     pass
 
 try:
+    print("\nincrement(bin, index, delta-value[, writeFlags, context])\n")
     # create a new record with one element by upsert
     # a list created using increment will be unordered, regardless of the
     # list order policy
     ret = client.operate(key, [list_operations.list_increment("l", 1, 2.1)])
     key, metadata, bins = client.get(key)
-    print("\n{}".format(bins["l"]))
+    print("increment('l', 1, 2.1)")
+    # increment('l', 1, 2.1)
+    print("{}".format(bins["l"]))
     # [None, 2.1] - Aerospike NIL represented as a Python None instance
 
     ops = [
@@ -44,7 +47,11 @@ try:
     ]
     client.operate(key, ops)
     key, metadata, bins = client.get(key)
-    print("\n{}".format(bins["l"]))
+    print("\nset('l', 0, 1)")
+    # set('l', 0, 1)
+    print("append_items('l', [[3, 4]])")
+    # append_items('l', [[3, 4]])
+    print("{}".format(bins["l"]))
     # [1, 2.1, [3, 4]]
 
     ops = [
@@ -55,7 +62,11 @@ try:
     ]
     client.operate(key, ops)
     key, metadata, bins = client.get(key)
-    print("\n{}".format(bins["l"]))
+    print("increment('l', 0, 4)")
+    # increment('l', 0, 4)
+    print("increment('l', 1, 2)")
+    # increment('l', 1, 2)
+    print("{}".format(bins["l"]))
     # [5, 4.1, [3, 4]]
 
     # increment the second element of the sublist at index 2
@@ -64,7 +75,9 @@ try:
     # the delta value was -2.0 and the element value was 4. the server type
     # cast the delta value into -2 to match its type to the type of the element
     key, metadata, bins = client.get(key)
-    print("\n{}".format(bins["l"]))
+    print("increment('l', 1, -2.0, BY_LIST_INDEX(2))")
+    # increment('l', 1, -2.0, BY_LIST_INDEX(2))
+    print("{}".format(bins["l"]))
     # [5, 4.1, [3, 2]]
 
     # increment cannot be used on ordered lists
@@ -78,10 +91,14 @@ try:
         # [9, [3, 2], 4.1]
     ]
     key, metadata, bins = client.operate_ordered(key, ops)
-    print("\nChanging to an ordered list:\n{}".format(bins[0][1]))
-    # [5, [3, 2], 4.1]
+    print("\nset_order('l', ORDERED)")
+    # set_order('l', ORDERED)
+    print("read('l'): {}".format(bins[0][1]))
+    # read('l'): [5, [3, 2], 4.1]
+    print("increment('l', 0, 4)")
+    # increment('l', 0, 4)
     key, metadata, bins = client.get(key)
-    print("\nAfter incrementing the 0th index the list re-sorts as:\n{}".format(bins["l"]))
+    print("{}".format(bins["l"]))
     # [9, [3, 2], 4.1]
 
     # switch back to unordered and see the effect of incrementing outside the
@@ -92,22 +109,28 @@ try:
     }
     ops = [
         list_operations.list_set_order("l", aerospike.LIST_UNORDERED),
-        list_operations.list_insert("l", 4, 2, policy),
+        list_operations.list_increment("l", 4, 2, policy),
     ]
     client.operate(key, ops)
-    print("\nGracefully fails with INSERT_BOUNDED an NO_FAIL")
+    print("\nset_order('l', ORDERED)")
+    # set_order('l', ORDERED)
+    print("increment('l', 4, 2, INSERT_BOUNDED|NO_FAIL)")
+    # increment('l', 4, 2, INSERT_BOUNDED|NO_FAIL)
     key, metadata, bins = client.get(key)
     print("{}".format(bins["l"]))
+    # [9, [3, 2], 4.1]
 
     # it is a bit odd to use increment with ADD_UNIQUE, but it is possible
     # here we will purposefully created another list element that is the
     # integer 9, and that should throw an error
     policy = {"write_flags": aerospike.LIST_WRITE_ADD_UNIQUE}
-    ops = [list_operations.list_insert("l", 3, 9, policy)]
+    ops = [list_operations.list_increment("l", 3, 9, policy)]
     try:
+        print("\nincrement('l', 3, 9, ADD_UNIQUE)")
+        # increment('l', 3, 9, ADD_UNIQUE)
         client.operate(key, ops)
     except ex.ElementExistsError as e:
-        print("\nError: {0} [{1}]".format(e.msg, e.code))
+        print("Error: {0} [{1}]".format(e.msg, e.code))
         # AEROSPIKE_ERR_FAIL_ELEMENT_EXISTS [24]
 
 except ex.ClientError as e:

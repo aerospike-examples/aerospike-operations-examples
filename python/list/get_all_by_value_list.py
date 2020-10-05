@@ -30,11 +30,12 @@ except ex.RecordError as e:
     pass
 
 try:
+    print("\nget_all_by_value_list(bin, values [, returnType, context])\n")
     # create a new record with a put. list policy can't be applied outside of
     # list operations, and a new list is unordered by default
     client.put(key, {"l": [2, 3, 2, 1, 2, 3, 2]})
     key, metadata, bins = client.get(key)
-    print("\n{}".format(bins["l"]))
+    print("{}".format(bins["l"]))
     # [2, 3, 2, 1, 2, 3, 2]
 
     # demonstrate the meaning of the different return types for the
@@ -62,18 +63,18 @@ try:
     # in the python client the operate() command returns the result of the last
     # operation on a specific bin, so using operate_ordered instead, which
     # gives the results as ordered (bin-name, result) tuples
-    print("\nlist get_all_by_value_list(VALUE, [1,2]): {}".format(bins[0][1]))
-    # [2, 2, 1, 2, 2]
-    print("list get_all_by_value_list(INDEX, [1,2]): {}".format(bins[1][1]))
-    # [0, 2, 3, 4, 6] - the index position of all the elements with values 1 or 2
-    print("list get_all_by_value_list(REVERSE_INDEX, [1,2]): {}".format(bins[2][1]))
-    # [6, 4, 3, 2, 0] - the reverse index position of all elements with values 1 or 2
-    print("list get_all_by_value_list(RANK, [1,2]): {}".format(bins[3][1]))
-    # [0, 1, 2, 3, 4] - the rank of all the elements with values 1 or 2
-    print("list get_all_by_value_list(REVERSE_RANK, [1,2]): {}".format(bins[4][1]))
-    # [6, 5, 4, 3, 2] - the reverse rank of all the elements with values 1 or 2
-    print("list get_all_by_value_list(COUNT, [1,2]): {}".format(bins[5][1]))
-    # 5 - a quick way to count how many elements with values 1 or 2 are in the list
+    print("\nget_all_by_value_list('l', [1,2], VALUE): {}".format(bins[0][1]))
+    # get_all_by_value_list('l', [1,2], VALUE): [2, 2, 1, 2, 2]
+    print("get_all_by_value_list('l', [1,2], INDEX): {}".format(bins[1][1]))
+    # get_all_by_value_list('l', [1,2], INDEX): [0, 2, 3, 4, 6]
+    print("get_all_by_value_list('l', [1,2], REVERSE_INDEX): {}".format(bins[2][1]))
+    # get_all_by_value_list('l', [1,2], REVERSE_INDEX): [6, 4, 3, 2, 0]
+    print("get_all_by_value_list('l', [1,2], RANK): {}".format(bins[3][1]))
+    # get_all_by_value_list('l', [1,2], RANK): [0, 1, 2, 3, 4]
+    print("get_all_by_value_list('l', [1,2], REVERSE_RANK): {}".format(bins[4][1]))
+    # get_all_by_value_list('l', [1,2], REVERSE_RANK): [6, 5, 4, 3, 2]
+    print("get_all_by_value_list('l', [1,2], COUNT): {}".format(bins[5][1]))
+    # get_all_by_value_list('l', [1,2], COUNT): 5
 
     # switch to more complex values, a list of (mostly) ordered pairs
     tuples = [["v1", 1], ["v2", 1], ["v1", 2], ["v2", 2], ["v1", 3, "z", 8], ["v1"]]
@@ -103,28 +104,28 @@ try:
     key, metadata, bins = client.operate_ordered(key, ops)
     print("\n{}".format(bins[0][1]))
     # [['v1', 1], ['v2', 1], ['v1', 2], ['v2', 2], ['v1', 3, 'z', 8], ['v1']]
-    print("\nlist get_all_by_value_list(INDEX, [['v1']]): {}".format(bins[1][1]))
-    # list get_all_by_value_list(INDEX, ['v1', 2]): [5]
+    print("get_all_by_value_list('l', [['v1']], INDEX): {}".format(bins[1][1]))
+    # list get_all_by_value_list('l', [['v1']], INDEX): [5]
     print(
-        "list get_all_by_value_list(VALUE, [['v1'], ['v1', *]]): {}".format(bins[2][1])
+        "get_all_by_value_list('l', [['v1'], ['v1', *]], VALUE): {}".format(bins[2][1])
     )
-    # list get_all_by_value_list(VALUE, [['v1'], ['v1', *]]): [['v1', 1], ['v1', 2], ['v1', 3, 'z', 8], ['v1']]
+    # list get_all_by_value_list('l', [['v1'], ['v1', *]], VALUE): [['v1', 1], ['v1', 2], ['v1', 3, 'z', 8], ['v1']]
     # The wildcard operation acts as a glob
     print(
-        "list get_all_by_value_list(INVERTED|VALUE, [['v1'], ['v1', *]]): {}".format(
+        "get_all_by_value_list('l', [['v1'], ['v1', *]], INVERTED|VALUE): {}".format(
             bins[3][1]
         )
     )
-    # list get_all_by_value_list(INVERTED|VALUE, [['v1'], ['v1', *]]): [['v2', 1], ['v2', 2]]
-    print("list get_all_by_value_list(VALUE, [['v1', 3, *]]): {}".format(bins[4][1]))
-    # list get_all_by_value_list(VALUE, [['v1', 3, *]]): [['v1', 3, 'z', 8]]
-    print("list get_all_by_value_list(VALUE, [[*,2]]): {}".format(bins[5][1]))
+    # list get_all_by_value_list('l', [['v1'], ['v1', *]], INVERTED|VALUE): [['v2', 1], ['v2', 2]]
+    print("get_all_by_value_list('l', [['v1', 3, *]], VALUE): {}".format(bins[4][1]))
+    # list get_all_by_value_list('l', [['v1', 3, *]], VALUE): [['v1', 3, 'z', 8]]
+    print("get_all_by_value_list('l', [[*,2]], VALUE): {}".format(bins[5][1]))
     # the wildcard matches everything to the end of the list, so anything to its
     # right is matched. We can't use get_by_value_list to find the elements which
     # are a list with a last element of 2. [*, 2] is the same as [*]
-    # list get_all_by_value_list(VALUE, [[*,2]]): [['v1', 1], ['v2', 1], ['v1', 2], ['v2', 2], ['v1', 3, 'z', 8], ['v1']]
-    print("list get_all_by_value_list(COUNT, [['z'], ['y']]): {}".format(bins[6][1]))
-    # list get_all_by_value_list(COUNT, [['z'], ['y']]): 0
+    # list get_all_by_value_list('l', [[*,2]], VALUE): [['v1', 1], ['v2', 1], ['v1', 2], ['v2', 2], ['v1', 3, 'z', 8], ['v1']]
+    print("get_all_by_value_list('l', [['z'], ['y']], COUNT): {}".format(bins[6][1]))
+    # list get_all_by_value_list('l', [['z'], ['y']], COUNT): 0
 
 except ex.ClientError as e:
     print("Error: {0} [{1}]".format(e.msg, e.code))

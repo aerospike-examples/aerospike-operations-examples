@@ -5,7 +5,6 @@ from aerospike import exception as ex
 from aerospike_helpers import cdt_ctx
 from aerospike_helpers.operations import list_operations
 from aerospike_helpers.operations import operations
-import pprint
 import sys
 
 if options.set == "None":
@@ -30,13 +29,14 @@ try:
 except ex.RecordError as e:
     pass
 
-pp = pprint.PrettyPrinter(indent=2)
 try:
+    print("\nget_by_index(bin, index[, returnType, context])\n")
     # create a new record with a put. list policy can't be applied outside of
     # list operations, and a new list is unordered by default
     client.put(key, {"l": [1, 4, 7, 3, 9, 26, 11]})
     key, metadata, bins = client.get(key)
-    print("\n{}".format(bins["l"]))
+    print("{}".format(bins["l"]))
+    # put('l', [1, 4, 7, 3, 9, 26, 11])
     # [1, 4, 7, 3, 9, 26, 11]
 
     # demonstrate the meaning of the different return types
@@ -54,14 +54,19 @@ try:
     # in the python client the operate() command returns the result of the last
     # operation on a specific bin, so using operate_ordered instead, which
     # gives the results as ordered (bin-name, result) tuples
-    pp.pprint(bins)
-    # [ ('l', 4), VALUE at index 1 is 4
-    #   ('l', 1), INDEX at index 1 is 1. redundant for this operation
-    #   ('l', 5), REVERSE_INDEX the index position of the VALUE (4) in
-    #             [11,26,9,3,7,4,1] is 5
-    #   ('l', 2), RANK of the VALUE is 2 (the 3rd lowest) in [1,3,4,7,9,11,26]
-    #   ('l', 4), REVERSE_RANK of the VALUE (4) in 4 [26,11,9,7,4,3,1] is 4
-    #   ('l', 1)] COUNT of elements returned is 1. redundant for this operation
+
+    print("\nget_by_index('l', 1, VALUE): {}".format(bins[0][1]))
+    # get_by_index('l', 1, VALUE): 4
+    print("get_by_index('l', 1, INDEX): {}".format(bins[1][1]))
+    # get_by_index('l', 1, INDEX): 1
+    print("get_by_index('l', 1, REVERSE_INDEX): {}".format(bins[2][1]))
+    # get_by_index('l', 1, REVERSE_INDEX): 5
+    print("get_by_index('l', 1, RANK): {}".format(bins[3][1]))
+    # get_by_index('l', 1, RANK): 2
+    print("get_by_index('l', 1, REVERSE_RANK): {}".format(bins[4][1]))
+    # get_by_index('l', 1, REVERSE_RANK): 4
+    print("get_by_index('l', 1, COUNT): {}".format(bins[5][1]))
+    # get_by_index('l', 1, COUNT): 1
 
     # read the element at index -2 (second from the end) and also append a new
     # element to the end of the list
@@ -71,21 +76,23 @@ try:
         operations.read("l"),
     ]
     key, metadata, bins = client.operate_ordered(key, ops)
-    print("\n{}".format(bins[0][1]))
-    # 26
-    print("\n{}".format(bins[2][1]))
-    # [1, 4, 7, 3, 9, 26, 11, [1, 3, 3, 7, 0]]
+    print("\nget_by_index('l', -2, VALUE): {}".format(bins[0][1]))
+    # get_by_index('l', -2, VALUE): 26
+    print("list_append('l', [1, 3, 3, 7, 0]")
+    # list_append('l', [1, 3, 3, 7, 0]
+    print("read('l'): {}".format(bins[2][1]))
+    # read('l'): [1, 4, 7, 3, 9, 26, 11, [1, 3, 3, 7, 0]]
 
     # find the reverse rank of the second element in the list nested within the
     # last element of the outer list
     ctx = [cdt_ctx.cdt_ctx_list_index(-1)]
     key, metadata, bins = client.operate(
         key,
-        [list_operations.list_get_by_index("l", 1, aerospike.LIST_RETURN_RANK, ctx)],
+        [list_operations.list_get_by_index("l", 1, aerospike.LIST_RETURN_REVERSE_RANK, ctx)],
     )
-    print("\n{}".format(bins["l"]))
-    # 1 which is the second highest rank (in reverse rank order)
-    # element at index -2 would also have a rank of 1, as both have the value 3
+    print("\nget_by_index('l', 1, REVERSE_RANK, BY_LIST_INDEX(-1)): {}".format(bins["l"]))
+    # get_by_index('l', 1, REVERSE_RANK, BY_LIST_INDEX(-1)): 2
+    # 2 which is the third highest rank (in reverse rank order)
 
     # try to perform a list operation on an index outside of the current list
     try:
@@ -93,9 +100,9 @@ try:
             key,
             [list_operations.list_get_by_index("l", 11, aerospike.LIST_RETURN_VALUE)],
         )
-        print("\n{}".format(bins["l"]))
+        print("\nget_by_index('l', 11, VALUE): {}".format(bins["l"]))
     except ex.OpNotApplicable as e:
-        print("\nError: {0} [{1}]".format(e.msg, e.code))
+        print("\nget_by_index('l', 11, VALUE)\nError: {0} [{1}]".format(e.msg, e.code))
         # Error: 0.0.0.0:3000 AEROSPIKE_ERR_OP_NOT_APPLICABLE [26]
 
     # turn the list into an ordered list, then get the elements at index 1, -1
@@ -105,14 +112,20 @@ try:
         list_operations.list_get_by_index("l", -1, aerospike.LIST_RETURN_VALUE),
     ]
     key, metadata, bins = client.operate_ordered(key, ops)
-    print("\n{}".format(bins[0][1]))
-    # second lowest index in the ordered list is 3
-    print("\n{}".format(bins[1][1]))
-    # highest index in the ordered list is [1, 3, 3, 7, 0]
+    print("\nset_order('l', ORDERED)")
+    # set_order('l', ORDERED)
+    print("get_by_index('l', 1, VALUE): {}".format(bins[0][1]))
+    # get_by_index('l', 1, VALUE): 3
+    # second lowest index in the ordered list is the second lowest rank (3)
+    print("get_by_index('l', -1, VALUE): {}".format(bins[1][1]))
+    # get_by_index('l', -1, VALUE): [1, 3, 3, 7, 0]
+    # highest index in the ordered list is [1, 3, 3, 7, 0], which has the
+    # highest rank. lists rank higher than all integers, based on the ordering
+    # rules: https://www.aerospike.com/docs/guide/cdt-ordering.html
 
     # get the entire ordered list
     key, metadata, bins = client.get(key)
-    print("\n{}".format(bins["l"]))
+    print("\nGet the full list: {}".format(bins["l"]))
     # [1, 3, 4, 7, 9, 11, 26, [1, 3, 3, 7, 0]]
     # notice that the set_order applied to the outer list, and did not modify
     # the order of the inner list. by the order commparison rules a list is
@@ -126,11 +139,15 @@ try:
         list_operations.list_get_by_index("l", -1, aerospike.LIST_RETURN_VALUE, ctx),
     ]
     key, metadata, bins = client.operate(key, ops)
-    print("\n{}".format(bins["l"]))
-    # 7 is the highest index in the inner list, now that it is ordered
+    print("\nset_order('l', ORDERED, BY_LIST_INDEX(-1))")
+    print("get_by_index('l', -1, VALUE, BY_LIST_INDEX(-1)): {}".format(bins["l"]))
+    # set_order('l', ORDERED, BY_LIST_INDEX(-1))
+    # get_by_index('l', -1, VALUE, BY_LIST_INDEX(-1)): 7
+    # 7 is the highest index in the inner list (and highest rank), now
+    # that it is ordered
 
     key, metadata, bins = client.get(key)
-    print("\n{}".format(bins["l"]))
+    print("\nGet the full list: {}".format(bins["l"]))
     # [1, 3, 4, 7, 9, 11, 26, [0, 1, 3, 3, 7]]
 
 except ex.ClientError as e:

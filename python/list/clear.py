@@ -29,6 +29,7 @@ except ex.RecordError as e:
     pass
 
 try:
+    print("\nclear(bin[, context])\n")
     # create a record with an unordered list
     client.put(key, {"l": [1, 2, [3, 4]]})
     key, metadata, bins = client.get(key)
@@ -39,8 +40,8 @@ try:
     ctx = [cdt_ctx.cdt_ctx_list_index(2)]
     client.operate(key, [list_operations.list_clear("l", ctx=ctx)])
     key, metadata, bins = client.get(key)
-    print("{}".format(bins["l"]))
-    # [1, 2, []]
+    print("clear('l', context=BY_LIST_INDEX(2)): {}".format(bins["l"]))
+    # clear('l', BY_LIST_INDEX(2)): [1, 2, []]
 except ex.ClientError as e:
     print("Error: {0} [{1}]".format(e.msg, e.code))
 
