@@ -30,11 +30,12 @@ except ex.RecordError as e:
     pass
 
 try:
+    print("\nremove_by_rank_range(bin, rank[, returnType, count, context])\n")
     # create a new record with a put. list policy can't be applied outside of
     # list operations, and a new list is unordered by default
     client.put(key, {"l": [1, 12, 13, 5, 4, 6, 8, 7, 9, 11, 10, 2, 3]})
     key, metadata, bins = client.get(key)
-    print("\n{}".format(bins["l"]))
+    print("{}".format(bins["l"]))
     # [1, 12, 13, 5, 4, 6, 8, 7, 9, 11, 10, 2, 3]
 
     # demonstrate the meaning of the different return types
@@ -51,23 +52,21 @@ try:
     # operation on a specific bin, so using operate_ordered instead, which
     # gives the results as ordered (bin-name, result) tuples
     print(
-        "\nlist remove_by_rank_range(VALUE, 6, 3)\nReturned: {}\nRemaining: {}".format(
+        "\nremove_by_rank_range('l', 6, VALUE, 3): {}\nRemaining: {}".format(
             bins[0][1], bins[1][1]
         )
     )
-    # list_remove_by_rank_range(VALUE, 6, 3)
-    # Returned: [7, 8, 9]
+    # remove_by_rank_range('l', 6, VALUE, 3): [7, 8, 9]
     # Remaining: [1, 12, 13, 5, 4, 6, 11, 10, 2, 3]
     print(
-        "\nlist remove_by_rank_range(COUNT, 3, 3)\nReturned: {}\nRemaining: {}".format(
+        "\nremove_by_rank_range('l', 3, COUNT, 3): {}\nRemaining: {}".format(
             bins[2][1], bins[3][1]
         )
     )
-    # list_remove_by_rank_range(COUNT, 3, 3)
-    # Returned: 3
+    # list_remove_by_rank_range('l', 3, COUNT, 3): 3
     # Remaining: [1, 12, 13, 11, 10, 2, 3]
-    print("\nlist remove_by_rank_range(NONE, 0, 3)\nRemaining: {}".format(bins[4][1]))
-    # list_remove_by_rank_range(NONE, 0, 3)
+    print("\nremove_by_rank_range('l', 0, NONE, 3)\nRemaining: {}".format(bins[4][1]))
+    # remove_by_rank_range('l', 0, NONE, 3)
     # Remaining: [12, 13, 11, 10]
 
     # remove the top 2 ranked elements and also append a new
@@ -78,7 +77,10 @@ try:
         operations.read("l"),
     ]
     key, metadata, bins = client.operate_ordered(key, ops)
-    print("\n{}".format(bins[1][1]))
+    print("\nremove_by_rank_range('l', -2, NONE)\nappend('l', [1, 3, 3, 7, 0])")
+    print("{}".format(bins[1][1]))
+    # remove_by_rank_range('l', -2, NONE)
+    # append('l', [1, 3, 3, 7, 0])
     # [11, 10, [1, 3, 3, 7, 0]]
 
     # remove all but the top 2 ranked elements from the list nested within the
@@ -91,7 +93,9 @@ try:
         listops.list_get_by_rank("l", -1, aerospike.LIST_RETURN_VALUE),
     ]
     key, metadata, bins = client.operate_ordered(key, ops)
-    print("\nInner list after the operation: {}".format(bins[0][1]))
+    print("\nremove_by_rank_range('l', -2, INVERTED|NONE, BY_LIST_INDEX(-1))")
+    print("Inner list after the operation: {}".format(bins[0][1]))
+    # remove_by_rank_range('l', -2, INVERTED|NONE, BY_LIST_INDEX(-1))
     # Inner list after the operation: [3, 7]
 
     # try to perform a list operation on a rank range outside of the current list
@@ -104,7 +108,9 @@ try:
                 operations.read("l"),
             ],
         )
-        print("\nRemaining: {}".format(bins["l"]))
+        print("\nremove_by_rank_range('l', 3, NONE)")
+        print("Remaining: {}".format(bins["l"]))
+        # remove_by_rank_range('l', 3, NONE)
         # [11, 10, [3, 7]]
     except ex.OpNotApplicable as e:
         print("\nError: {0} [{1}]".format(e.msg, e.code))
@@ -119,11 +125,12 @@ try:
     ]
     key, metadata, bins = client.operate_ordered(key, ops)
     print(
-        "\nAfter becoming an ordered list: {}\nRemoved: {}\nRemaining: {}".format(
+        "\nAfter becoming an ordered list: {}\nremove_by_rank_range('l', -2, VALUE): {}\n{}".format(
             bins[0][1], bins[1][1], bins[2][1]
         )
     )
-    # Removed: [11, [3, 7]]
+    # After becoming an ordered list: [10, 11, [3, 7]]
+    # remove_by_rank_range('l', -2, VALUE): [11, [3, 7]]
     # Remaining: [10]
 
 except ex.ClientError as e:

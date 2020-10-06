@@ -30,6 +30,7 @@ except ex.RecordError as e:
     pass
 
 try:
+    print("\nremove_all_by_value_list(bin, values[, returnType, context])\n")
     sample = [1, 2, 3, 4, 3, 2, 1]
 
     # set the list value, try the VALUE return type
@@ -42,12 +43,12 @@ try:
     ]
     key, metadata, bins = client.operate_ordered(key, ops)
     print(
-        "\n{}\nlist remove_all_by_value_list(VALUE, [2, 3])\n{}".format(
+            "\n{}\nremove_all_by_value_list('l', [2, 3], VALUE): {}".format(
             bins[0][1], bins[1][1]
         )
     )
     # [1, 2, 3, 4, 3, 2, 1]
-    # [2, 3, 3, 2]
+    # remove_all_by_value_list('l', [2, 3], VALUE): [2, 3, 3, 2]
 
     # reset the list value, try the INDEX return type
     ops = [
@@ -59,12 +60,12 @@ try:
     ]
     key, metadata, bins = client.operate_ordered(key, ops)
     print(
-        "\n{}\nlist remove_all_by_value_list(INDEX, [2, 3])\n{}".format(
+            "\n{}\nremove_all_by_value_list('l', [2, 3], INDEX): {}".format(
             bins[0][1], bins[1][1]
         )
     )
     # [1, 2, 3, 4, 3, 2, 1]
-    # [1, 2, 4, 5]
+    # remove_all_by_value_list('l', [2, 3], INDEX): [1, 2, 4, 5]
 
     # reset the list value, try the REVERSE_INDEX return type
     ops = [
@@ -76,12 +77,12 @@ try:
     ]
     key, metadata, bins = client.operate_ordered(key, ops)
     print(
-        "\n{}\nlist remove_all_by_value_list(REVERSE_INDEX, [2, 3])\n{}".format(
+            "\n{}\nremove_all_by_value_list('l', [2, 3], REVERSE_INDEX): {}".format(
             bins[0][1], bins[1][1]
         )
     )
     # [1, 2, 3, 4, 3, 2, 1]
-    # [5, 4, 2, 1]
+    # remove_all_by_value_list('l', [2, 3], REVERSE_INDEX): [5, 4, 2, 1]
 
     # reset the list value, try the RANK return type
     ops = [
@@ -93,12 +94,12 @@ try:
     ]
     key, metadata, bins = client.operate_ordered(key, ops)
     print(
-        "\n{}\nlist remove_all_by_value_list(RANK, [2, 3])\n{}".format(
+            "\n{}\nremove_all_by_value_list('l', [2, 3], RANK): {}".format(
             bins[0][1], bins[1][1]
         )
     )
     # [1, 2, 3, 4, 3, 2, 1]
-    # [2, 3, 4, 5]
+    # remove_all_by_value_list('l', [2, 3], RANK): [2, 3, 4, 5]
 
     # reset the list value, try the REVERSE_RANK return type
     ops = [
@@ -110,12 +111,12 @@ try:
     ]
     key, metadata, bins = client.operate_ordered(key, ops)
     print(
-        "\n{}\nlist remove_all_by_value_list(REVERSE_RANK, [2, 3])\n{}".format(
+            "\n{}\nremove_all_by_value_list('l', [2, 3], REVERSE_RANK): {}".format(
             bins[0][1], bins[1][1]
         )
     )
     # [1, 2, 3, 4, 3, 2, 1]
-    # [4, 3, 2, 1]
+    # remove_all_by_value_list('l', [2, 3], REVERSE_RANK): [4, 3, 2, 1]
 
     # reset the list value, try the COUNT return type
     ops = [
@@ -127,12 +128,12 @@ try:
     ]
     key, metadata, bins = client.operate_ordered(key, ops)
     print(
-        "\n{}\nlist remove_all_by_value_list(COUNT, [2, 3])\n{}".format(
+            "\n{}\nremove_all_by_value_list('l', [2, 3], COUNT): {}".format(
             bins[0][1], bins[1][1]
         )
     )
     # [1, 2, 3, 4, 3, 2, 1]
-    # 4
+    # remove_all_by_value_list('l', [2, 3], COUNT): 4
 
     # reset the list value, try the NONE return type
     ops = [
@@ -144,10 +145,11 @@ try:
     ]
     key, metadata, bins = client.operate(key, ops)
     print(
-        "\nlist remove_all_by_value_list(NONE, [2, 3])\nNo return. All operations result in {}".format(
+        "\nremove_all_by_value_list('l', [2, 3], NONE)\nNo return. All operations result in {}".format(
             bins["l"]
         )
     )
+    # remove_all_by_value_list('l', [2, 3], NONE)
     # No return. All operations result in [1, 4, 1]
 
     # switch to more complex values, a list of (mostly) ordered pairs
@@ -168,13 +170,13 @@ try:
     print("\nList before: {}".format(bins[0][1]))
     # List before: [['v1', 1], ['v2', 1], ['v1', 2], ['v2', 2], ['v1', 3, 9], ['v2']]
     print(
-        "list remove_all_by_value_list(VALUE, [['v1', *], ['v2', *]]): {}".format(
+        "remove_all_by_value_list('l', [['v1', *], ['v2', *]], VALUE): {}".format(
             bins[1][1]
         )
     )
-    # list remove_all_by_value_list(VALUE, [['v1', *], ['v2', *]]): [['v1', 1], ['v2', 1], ['v1', 2], ['v2', 2], ['v1', 3, 9]]
-    print("list remove_all_by_value_list(COUNT, [['z']]): {}".format(bins[2][1]))
-    # list remove_all_by_value_list(COUNT, [['z']]): 0
+    # remove_all_by_value_list('l', [['v1', *], ['v2', *]], VALUE): [['v1', 1], ['v2', 1], ['v1', 2], ['v2', 2], ['v1', 3, 9]]
+    print("remove_all_by_value_list('l', [['z']], COUNT): {}".format(bins[2][1]))
+    # remove_all_by_value_list('l', [['z']], COUNT): 0
     print("List after: {}".format(bins[3][1]))
     # List after: [['v2']]
 

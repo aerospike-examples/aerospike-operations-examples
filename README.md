@@ -55,7 +55,7 @@ Status
 
 List Operations
 ---------------
-The [List](https://www.aerospike.com/docs/guide/cdt-list.html#list-api) operations are 18/26 complete, with examples in [Python](https://github.com/aerospike-examples/aerospike-operations-examples/tree/master/python/list).
+The [List](https://www.aerospike.com/docs/guide/cdt-list.html#list-api) operations have examples in [Python](https://github.com/aerospike-examples/aerospike-operations-examples/tree/master/python/list).
 
 Map Operations
 -------------

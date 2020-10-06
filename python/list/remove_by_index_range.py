@@ -5,7 +5,6 @@ from aerospike import exception as ex
 from aerospike_helpers import cdt_ctx
 from aerospike_helpers.operations import list_operations as listops
 from aerospike_helpers.operations import operations
-import pprint
 import sys
 
 if options.set == "None":
@@ -30,13 +29,13 @@ try:
 except ex.RecordError as e:
     pass
 
-pp = pprint.PrettyPrinter(indent=2)
 try:
+    print("\nremove_by_index_range(bin, index[, returnType, count, context])\n")
     # create a new record with a put. list policy can't be applied outside of
     # list operations, and a new list is unordered by default
     client.put(key, {"l": [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 10, 12, 13]})
     key, metadata, bins = client.get(key)
-    print("\n{}".format(bins["l"]))
+    print("{}".format(bins["l"]))
     # [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 10, 12, 13]
 
     # demonstrate the meaning of the different return types
@@ -53,23 +52,21 @@ try:
     # operation on a specific bin, so using operate_ordered instead, which
     # gives the results as ordered (bin-name, result) tuples
     print(
-        "\nlist remove_by_index_range(VALUE, 6, 3)\nReturned: {}\nRemaining: {}".format(
+        "\nremove_by_index_range('l', 6, VALUE, 3): {}\nRemaining: {}".format(
             bins[0][1], bins[1][1]
         )
     )
-    # list_remove_by_index_range(VALUE, 6, 3)
-    # Returned: [7, 8, 9]
+    # remove_by_index_range('l', 6, VALUE, 3): [7, 8, 9]
     # Remaining: [1, 2, 3, 4, 5, 6, 11, 10, 12, 13]
     print(
-        "\nlist remove_by_index_range(COUNT, 3, 3)\nReturned: {}\nRemaining: {}".format(
+        "\nremove_by_index_range('l', 3, COUNT, 3): {}\nRemaining: {}".format(
             bins[2][1], bins[3][1]
         )
     )
-    # list_remove_by_index_range(COUNT, 3, 3)
-    # Returned: 3
+    # remove_by_index_range('l', 3, COUNT, 3): 3
     # Remaining: [1, 2, 3, 11, 10, 12, 13]
-    print("\nlist remove_by_index_range(NONE, 0, 3)\nRemaining: {}".format(bins[4][1]))
-    # list_remove_by_index_range(NONE, 0, 3)
+    print("\nremove_by_index_range('l', 0, NONE, 3)\nRemaining: {}".format(bins[4][1]))
+    # remove_by_index_range('l', 0, NONE, 3)
     # Remaining: [11, 10, 12, 13]
 
     # remove all elements from index -2 (second from the end) and also append a new
@@ -80,7 +77,11 @@ try:
         operations.read("l"),
     ]
     key, metadata, bins = client.operate_ordered(key, ops)
-    print("\n{}".format(bins[1][1]))
+    print("\nremove_by_index_range('l', -2, NONE)")
+    print("append('l', [1, 3, 3, 7, 0])")
+    print("{}".format(bins[1][1]))
+    # remove_by_index_range('l', -2, NONE)
+    # append('l', [1, 3, 3, 7, 0])
     # [11, 10, [1, 3, 3, 7, 0]]
 
     # remove all but the last 2 elements from the list nested within the
@@ -93,7 +94,10 @@ try:
         listops.list_get_by_index("l", -1, aerospike.LIST_RETURN_VALUE),
     ]
     key, metadata, bins = client.operate_ordered(key, ops)
-    print("\nInner list after the operation: {}".format(bins[0][1]))
+    print("\nremove_by_index_range('l', -2, INVERTED|NONE, BY_LIST_INDEX(-1))")
+    print("Inner list after the operation: {}".format(bins[0][1]))
+    # remove_by_index_range('l', -2, INVERTED|NONE, BY_LIST_INDEX(-1))
+    # Inner list after the operation: [7, 0]
 
     # try to perform a list operation on an index range outside of the current list
     try:
@@ -105,8 +109,10 @@ try:
                 operations.read("l"),
             ],
         )
-        print("\nRemaining: {}".format(bins["l"]))
-        # [11, 10, [7, 0]]
+        print("\nremove_by_index_range('l', 3, NONE)")
+        print("Remaining: {}".format(bins["l"]))
+        # remove_by_index_range('l', 3, NONE)
+        # Remaining: [11, 10, [7, 0]]
     except ex.OpNotApplicable as e:
         print("\nError: {0} [{1}]".format(e.msg, e.code))
 
@@ -124,6 +130,7 @@ try:
             bins[0][1], bins[1][1], bins[2][1]
         )
     )
+    # After becoming an ordered list: [10, 11, [7, 0]]
     # Removed: [11, [7, 0]]
     # Remaining: [10]
 

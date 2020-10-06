@@ -30,6 +30,7 @@ except ex.RecordError as e:
     pass
 
 try:
+    print("\nremove_by_rank(bin, rank[, returnType, context])\n")
     sample = [6, 10, 5, 11, 4, 12, 3]
 
     # set the list value, try the VALUE return type
@@ -39,9 +40,9 @@ try:
         list_operations.list_remove_by_rank("l", 0, aerospike.LIST_RETURN_VALUE),
     ]
     key, metadata, bins = client.operate_ordered(key, ops)
-    print("\n{}\nlist remove_by_rank(VALUE, 0)\n{}".format(bins[0][1], bins[1][1]))
+    print("\n{}\nremove_by_rank('l', 0, VALUE): {}".format(bins[0][1], bins[1][1]))
     # [6, 10, 5, 11, 4, 12, 3]
-    # 3
+    # remove_by_rank('l', 0, VALUE): 3
 
     # reset the list value, try the INDEX return type
     ops = [
@@ -50,9 +51,9 @@ try:
         list_operations.list_remove_by_rank("l", 0, aerospike.LIST_RETURN_INDEX),
     ]
     key, metadata, bins = client.operate_ordered(key, ops)
-    print("\n{}\nlist remove_by_rank(INDEX, 0)\n{}".format(bins[0][1], bins[1][1]))
+    print("\n{}\nremove_by_rank('l', 0, INDEX): {}".format(bins[0][1], bins[1][1]))
     # [6, 10, 5, 11, 4, 12, 3]
-    # 6
+    # remove_by_rank('l', 0, INDEX): 6
 
     # reset the list value, try the REVERSE_INDEX return type
     ops = [
@@ -61,9 +62,9 @@ try:
         list_operations.list_remove_by_rank("l", 0, aerospike.LIST_RETURN_REVERSE_INDEX),
     ]
     key, metadata, bins = client.operate_ordered(key, ops)
-    print("\n{}\nlist remove_by_rank(REVERSE_INDEX, 0)\n{}".format(bins[0][1], bins[1][1]))
+    print("\n{}\nremove_by_rank('l', 0, REVERSE_INDEX): {}".format(bins[0][1], bins[1][1]))
     # [6, 10, 5, 11, 4, 12, 3]
-    # 0
+    # remove_by_rank('l', 0, REVERSE_INDEX): 0
 
     # reset the list value, try the RANK return type
     ops = [
@@ -72,9 +73,9 @@ try:
         list_operations.list_remove_by_rank("l", 0, aerospike.LIST_RETURN_RANK),
     ]
     key, metadata, bins = client.operate_ordered(key, ops)
-    print("\n{}\nlist remove_by_rank(RANK, 0)\n{}".format(bins[0][1], bins[1][1]))
+    print("\n{}\nremove_by_rank('l', 0, RANK): {}".format(bins[0][1], bins[1][1]))
     # [6, 10, 5, 11, 4, 12, 3]
-    # 0
+    # remove_by_rank('l', 0, RANK): 0
 
     # reset the list value, try the REVERSE_RANK return type
     ops = [
@@ -83,9 +84,9 @@ try:
         list_operations.list_remove_by_rank("l", 0, aerospike.LIST_RETURN_REVERSE_RANK),
     ]
     key, metadata, bins = client.operate_ordered(key, ops)
-    print("\n{}\nlist remove_by_rank(REVERSE_RANK, 0)\n{}".format(bins[0][1], bins[1][1]))
+    print("\n{}\nremove_by_rank('l', 0, REVERSE_RANK): {}".format(bins[0][1], bins[1][1]))
     # [6, 10, 5, 11, 4, 12, 3]
-    # 6
+    # remove_by_rank('l', 0, REVERSE_RANK): 6
 
     # reset the list value, try the COUNT return type
     ops = [
@@ -94,9 +95,9 @@ try:
         list_operations.list_remove_by_rank("l", 0, aerospike.LIST_RETURN_COUNT),
     ]
     key, metadata, bins = client.operate_ordered(key, ops)
-    print("\n{}\nlist remove_by_rank(COUNT, 0)\n{}".format(bins[0][1], bins[1][1]))
+    print("\n{}\nremove_by_rank('l', 0, COUNT): {}".format(bins[0][1], bins[1][1]))
     # [6, 10, 5, 11, 4, 12, 3]
-    # 1
+    # remove_by_rank('l', 0, COUNT): 1
 
     # reset the list value, try the NONE return type
     ops = [
@@ -105,7 +106,8 @@ try:
         operations.read("l"),
     ]
     key, metadata, bins = client.operate(key, ops)
-    print("\nlist remove_by_rank(NONE, 0)\nNo return. All operations result in {}".format(bins["l"]))
+    print("\nremove_by_rank('l', 0, NONE)\nNo return. All operations result in {}".format(bins["l"]))
+    # remove_by_rank('l', 0, NONE)
     # No return. All operations result in [6, 10, 5, 11, 4, 12]
 
     # remove the second highest ranked element (-2) and also append a new
@@ -116,8 +118,8 @@ try:
         operations.read("l"),
     ]
     key, metadata, bins = client.operate_ordered(key, ops)
-    print("\nlist remove_by_rank(VALUE, -2)\n{}\n{}".format(bins[0][1], bins[2][1]))
-    # 11
+    print("\nremove_by_rank('l', -2, VALUE): {}\n{}".format(bins[0][1], bins[2][1]))
+    # remove_by_rank('l', -2, VALUE): 11
     # [6, 10, 5, 4, 12, [1, 3, 3, 7, 0]]
 
     # remove the highest ranked element of the inner list
@@ -128,18 +130,23 @@ try:
         list_operations.list_get_by_index("l", -1, aerospike.LIST_RETURN_VALUE),
     ]
     key, metadata, bins = client.operate(key, ops)
-    print("\nInner list after the highest ranked element is removed\n{}".format(bins["l"]))
+    print("\nremove_by_rank('l', -1, NONE, BY_LIST_INDEX(-1))")
+    print("get_by_index('l', -1, VALUE)")
+    print("Inner list after the highest ranked element is removed\n{}".format(bins["l"]))
+    # remove_by_rank('l', -1, NONE, BY_LIST_INDEX(-1))
+    # get_by_index('l', -1, VALUE)
     # [1, 3, 3, 0]
 
     # try to perform a remove by index operation on an index outside of the current list
     try:
+        print("\nremove_by_rank('l', 11, VALUE)")
         key, metadata, bins = client.operate(
             key,
             [list_operations.list_remove_by_rank("l", 11, aerospike.LIST_RETURN_VALUE)],
         )
         print("\n{}".format(bins["l"]))
     except ex.OpNotApplicable as e:
-        print("\nError: {0} [{1}]".format(e.msg, e.code))
+        print("Error: {0} [{1}]".format(e.msg, e.code))
         # Error: 0.0.0.0:3000 AEROSPIKE_ERR_OP_NOT_APPLICABLE [26]
 
 except ex.ClientError as e:

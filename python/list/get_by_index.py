@@ -129,8 +129,7 @@ try:
     # [1, 3, 4, 7, 9, 11, 26, [1, 3, 3, 7, 0]]
     # notice that the set_order applied to the outer list, and did not modify
     # the order of the inner list. by the order commparison rules a list is
-    # higher than integers.
-
+    # higher than integers. 
     # to order the inner list, we need to apply set_order with a context
     # identifying the list element
     ctx = [cdt_ctx.cdt_ctx_list_index(-1)]
