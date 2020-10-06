@@ -29,6 +29,7 @@ except ex.RecordError as e:
     pass
 
 try:
+    print("\nset_order(bin, order[, context])\n")
     # create a record with an unordered list
     client.put(key, {"l": [4, 5, 8, 1, 2, [3, 2], 9, 6]})
     key, metadata, bins = client.get(key)
@@ -41,13 +42,14 @@ try:
         key, [list_operations.list_set_order("l", aerospike.LIST_ORDERED, ctx)]
     )
     key, metadata, bins = client.get(key)
-    print("{}".format(bins["l"]))
+    print("\nset_order('l', ORDERED, BY_LIST_INDEX(5))\n{}".format(bins["l"]))
+    # set_order('l', ORDERED, BY_LIST_INDEX(5))
     # [4, 5, 8, 1, 2, [2, 3], 9, 6]
 
     # set the outer list to ORDERED
     client.operate(key, [list_operations.list_set_order("l", aerospike.LIST_ORDERED)])
     key, metadata, bins = client.get(key)
-    print("{}".format(bins["l"]))
+    print("\nset_order('l', ORDERED)\n{} ".format(bins["l"]))
     # [1, 2, 4, 5, 6, 8, 9, [2, 3]]
     # note that list ordering puts integers elements before list elements
     # see https://www.aerospike.com/docs/guide/cdt-ordering.html

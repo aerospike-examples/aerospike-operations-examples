@@ -29,6 +29,7 @@ except ex.RecordError as e:
     pass
 
 try:
+    print("\nsize(bin[, context])\n")
     # create a record with an unordered list
     client.put(key, {"l": [1, 2, [3, 4]]})
     key, metadata, bins = client.get(key)
@@ -36,13 +37,13 @@ try:
     # [1, 2, [3, 4]]
 
     key, metadata, bins = client.operate(key, [list_operations.list_size("l")])
-    print("\nThe size of the list is {}".format(bins["l"]))
+    print("\nsize('l'): {}".format(bins["l"]))
     # The size of the list is 3
 
     # get the size of the inner list (at index 2)
     ctx = [cdt_ctx.cdt_ctx_list_index(2)]
     key, metadata, bins = client.operate(key, [list_operations.list_size("l", ctx=ctx)])
-    print("\nThe size of the sub-list is {}".format(bins["l"]))
+    print("\nsize('l', BY_LIST_INDEX(4)): {}".format(bins["l"]))
     # The size of the sub-list is 2
 except ex.ClientError as e:
     print("Error: {0} [{1}]".format(e.msg, e.code))
