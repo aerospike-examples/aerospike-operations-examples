@@ -3,7 +3,7 @@ from args import options
 import aerospike
 from aerospike import exception as ex
 from aerospike_helpers import cdt_ctx
-from aerospike_helpers.operations import list_operations
+from aerospike_helpers.operations import list_operations as listops
 from aerospike_helpers.operations import operations
 import sys
 
@@ -15,6 +15,7 @@ config = {
     "policies": {
         "operate": {"key": aerospike.POLICY_KEY_SEND},
         "read": {"key": aerospike.POLICY_KEY_SEND},
+        "write": {"key": aerospike.POLICY_KEY_SEND},
     },
 }
 try:
@@ -36,16 +37,16 @@ try:
     # is in the interval [2, 4) multiple times in the same transaction
     ops = [
         operations.write("l", [1, 2, 3, 4, 5, 4, 3, 2, 1]),
-        list_operations.list_get_by_value_range("l", aerospike.LIST_RETURN_VALUE, 2, 4),
-        list_operations.list_get_by_value_range("l", aerospike.LIST_RETURN_INDEX, 2, 4),
-        list_operations.list_get_by_value_range(
+        listops.list_get_by_value_range("l", aerospike.LIST_RETURN_VALUE, 2, 4),
+        listops.list_get_by_value_range("l", aerospike.LIST_RETURN_INDEX, 2, 4),
+        listops.list_get_by_value_range(
             "l", aerospike.LIST_RETURN_REVERSE_INDEX, 2, 4
         ),
-        list_operations.list_get_by_value_range("l", aerospike.LIST_RETURN_RANK, 2, 4),
-        list_operations.list_get_by_value_range(
+        listops.list_get_by_value_range("l", aerospike.LIST_RETURN_RANK, 2, 4),
+        listops.list_get_by_value_range(
             "l", aerospike.LIST_RETURN_REVERSE_RANK, 2, 4
         ),
-        list_operations.list_get_by_value_range("l", aerospike.LIST_RETURN_COUNT, 2, 4),
+        listops.list_get_by_value_range("l", aerospike.LIST_RETURN_COUNT, 2, 4),
     ]
     key, metadata, bins = client.operate_ordered(key, ops)
     # in the python client the operate() command returns the result of the last
@@ -80,16 +81,16 @@ try:
     ops = [
         operations.write("l", tuples),
         operations.read("l"),
-        list_operations.list_get_by_value_range(
+        listops.list_get_by_value_range(
             "l", aerospike.LIST_RETURN_VALUE, [23003, nil], [25005, nil]
         ),
-        list_operations.list_get_by_value_range(
+        listops.list_get_by_value_range(
             "l", aerospike.LIST_RETURN_VALUE, [23003, nil], [25005, infinite]
         ),
-        list_operations.list_get_by_value_range(
+        listops.list_get_by_value_range(
             "l", aerospike.LIST_RETURN_VALUE, [23003, infinite], [25005, infinite]
         ),
-        list_operations.list_get_by_value_range(
+        listops.list_get_by_value_range(
             "l", aerospike.LIST_RETURN_VALUE, [23003, "rick"], [25005, "morty"]
         ),
     ]

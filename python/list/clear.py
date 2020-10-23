@@ -3,7 +3,7 @@ from args import options
 import aerospike
 from aerospike import exception as ex
 from aerospike_helpers import cdt_ctx
-from aerospike_helpers.operations import list_operations
+from aerospike_helpers.operations import list_operations as listops
 import sys
 
 if options.set == "None":
@@ -14,6 +14,7 @@ config = {
     "policies": {
         "operate": {"key": aerospike.POLICY_KEY_SEND},
         "read": {"key": aerospike.POLICY_KEY_SEND},
+        "write": {"key": aerospike.POLICY_KEY_SEND},
     },
 }
 try:
@@ -38,7 +39,7 @@ try:
 
     # clear the inner list (at index 2)
     ctx = [cdt_ctx.cdt_ctx_list_index(2)]
-    client.operate(key, [list_operations.list_clear("l", ctx=ctx)])
+    client.operate(key, [listops.list_clear("l", ctx=ctx)])
     key, metadata, bins = client.get(key)
     print("clear('l', context=BY_LIST_INDEX(2)): {}".format(bins["l"]))
     # clear('l', BY_LIST_INDEX(2)): [1, 2, []]

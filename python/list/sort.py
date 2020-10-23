@@ -3,7 +3,7 @@ from args import options
 import aerospike
 from aerospike import exception as ex
 from aerospike_helpers import cdt_ctx
-from aerospike_helpers.operations import list_operations
+from aerospike_helpers.operations import list_operations as listops
 import sys
 
 if options.set == "None":
@@ -14,6 +14,7 @@ config = {
     "policies": {
         "operate": {"key": aerospike.POLICY_KEY_SEND},
         "read": {"key": aerospike.POLICY_KEY_SEND},
+        "write": {"key": aerospike.POLICY_KEY_SEND},
     },
 }
 try:
@@ -38,14 +39,14 @@ try:
 
     # sort the inner list (at index 5)
     ctx = [cdt_ctx.cdt_ctx_list_index(5)]
-    client.operate(key, [list_operations.list_sort("l", ctx=ctx)])
+    client.operate(key, [listops.list_sort("l", ctx=ctx)])
     key, metadata, bins = client.get(key)
     print("sort('l', ctx=BIN_LIST_INDEX(5))\n{}".format(bins["l"]))
     # [5, 1, 8, 2, 7, [1, 2, 3, 4], 9, 6, 1, 2]
 
     # sort the outer list and drop duplicates
     client.operate(
-        key, [list_operations.list_sort("l", aerospike.LIST_SORT_DROP_DUPLICATES)]
+        key, [listops.list_sort("l", aerospike.LIST_SORT_DROP_DUPLICATES)]
     )
     key, metadata, bins = client.get(key)
     print("\nsort('l', DROP_DUPLICATES)\n{}".format(bins["l"]))

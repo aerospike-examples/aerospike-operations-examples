@@ -3,7 +3,7 @@ from args import options
 import aerospike
 from aerospike import exception as ex
 from aerospike_helpers import cdt_ctx
-from aerospike_helpers.operations import list_operations
+from aerospike_helpers.operations import list_operations as listops
 from aerospike_helpers.operations import operations
 import sys
 
@@ -42,20 +42,20 @@ try:
     # list data type read operations, by getting all elements with value 2
     # from list multiple times in the same transaction
     ops = [
-        list_operations.list_get_by_value_list(
+        listops.list_get_by_value_list(
             "l", [1, 2], aerospike.LIST_RETURN_VALUE
         ),
-        list_operations.list_get_by_value_list(
+        listops.list_get_by_value_list(
             "l", [1, 2], aerospike.LIST_RETURN_INDEX
         ),
-        list_operations.list_get_by_value_list(
+        listops.list_get_by_value_list(
             "l", [1, 2], aerospike.LIST_RETURN_REVERSE_INDEX
         ),
-        list_operations.list_get_by_value_list("l", [1, 2], aerospike.LIST_RETURN_RANK),
-        list_operations.list_get_by_value_list(
+        listops.list_get_by_value_list("l", [1, 2], aerospike.LIST_RETURN_RANK),
+        listops.list_get_by_value_list(
             "l", [1, 2], aerospike.LIST_RETURN_REVERSE_RANK
         ),
-        list_operations.list_get_by_value_list(
+        listops.list_get_by_value_list(
             "l", [1, 2], aerospike.LIST_RETURN_COUNT
         ),
     ]
@@ -82,22 +82,22 @@ try:
     ops = [
         operations.write("l", tuples),
         operations.read("l"),
-        list_operations.list_get_by_value_list(
+        listops.list_get_by_value_list(
             "l", [["v1"]], aerospike.LIST_RETURN_INDEX
         ),
-        list_operations.list_get_by_value_list(
+        listops.list_get_by_value_list(
             "l", [["v1"], ["v1", wildcard]], aerospike.LIST_RETURN_VALUE
         ),
-        list_operations.list_get_by_value_list(
+        listops.list_get_by_value_list(
             "l", [["v1"], ["v1", wildcard]], aerospike.LIST_RETURN_VALUE, inverted=True
         ),
-        list_operations.list_get_by_value_list(
+        listops.list_get_by_value_list(
             "l", [["v1", 3, wildcard]], aerospike.LIST_RETURN_VALUE
         ),
-        list_operations.list_get_by_value_list(
+        listops.list_get_by_value_list(
             "l", [[wildcard, 2]], aerospike.LIST_RETURN_VALUE
         ),
-        list_operations.list_get_by_value_list(
+        listops.list_get_by_value_list(
             "l", [["z"], ["y"]], aerospike.LIST_RETURN_COUNT
         ),
     ]

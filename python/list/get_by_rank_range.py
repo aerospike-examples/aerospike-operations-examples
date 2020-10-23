@@ -15,6 +15,7 @@ config = {
     "policies": {
         "operate": {"key": aerospike.POLICY_KEY_SEND},
         "read": {"key": aerospike.POLICY_KEY_SEND},
+        "write": {"key": aerospike.POLICY_KEY_SEND},
     },
 }
 try:

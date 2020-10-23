@@ -3,7 +3,7 @@ from args import options
 import aerospike
 from aerospike import exception as ex
 from aerospike_helpers import cdt_ctx
-from aerospike_helpers.operations import list_operations as lops
+from aerospike_helpers.operations import list_operations as listops
 from aerospike_helpers.operations import operations
 import sys
 
@@ -35,22 +35,22 @@ try:
     ops = [
         operations.write("l", [2, 4, 7, 3, 8, 9, 26, 11]),
         operations.read("l"),
-        lops.list_get_by_value_rank_range_relative(
+        listops.list_get_by_value_rank_range_relative(
             "l", 5, -2, aerospike.LIST_RETURN_VALUE, 3
         ),
-        lops.list_get_by_value_rank_range_relative(
+        listops.list_get_by_value_rank_range_relative(
             "l", 5, -2, aerospike.LIST_RETURN_INDEX, 3
         ),
-        lops.list_get_by_value_rank_range_relative(
+        listops.list_get_by_value_rank_range_relative(
             "l", 5, -2, aerospike.LIST_RETURN_REVERSE_INDEX, 3
         ),
-        lops.list_get_by_value_rank_range_relative(
+        listops.list_get_by_value_rank_range_relative(
             "l", 5, -2, aerospike.LIST_RETURN_RANK, 3
         ),
-        lops.list_get_by_value_rank_range_relative(
+        listops.list_get_by_value_rank_range_relative(
             "l", 5, -2, aerospike.LIST_RETURN_REVERSE_RANK, 3
         ),
-        lops.list_get_by_value_rank_range_relative(
+        listops.list_get_by_value_rank_range_relative(
             "l", 5, -2, aerospike.LIST_RETURN_COUNT, 3
         ),
     ]
@@ -103,7 +103,7 @@ try:
         key, metadata, bins = client.operate(
             key,
             [
-                lops.list_get_by_value_rank_range_relative(
+                listops.list_get_by_value_rank_range_relative(
                     "l", 99, -1, aerospike.LIST_RETURN_VALUE, 4
                 )
             ],
@@ -121,7 +121,7 @@ try:
     ops = [
         operations.write("l", tuples),
         operations.read("l"),
-        lops.list_get_by_value_rank_range_relative(
+        listops.list_get_by_value_rank_range_relative(
             "l", ["c", nil], -1, aerospike.LIST_RETURN_VALUE, 2
         ),
     ]

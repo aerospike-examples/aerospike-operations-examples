@@ -3,7 +3,7 @@ from args import options
 import aerospike
 from aerospike import exception as ex
 from aerospike_helpers import cdt_ctx
-from aerospike_helpers.operations import list_operations
+from aerospike_helpers.operations import list_operations as listops
 from aerospike_helpers.operations import operations
 import sys
 
@@ -15,6 +15,7 @@ config = {
     "policies": {
         "operate": {"key": aerospike.POLICY_KEY_SEND},
         "read": {"key": aerospike.POLICY_KEY_SEND},
+        "write": {"key": aerospike.POLICY_KEY_SEND},
     },
 }
 try:
@@ -42,12 +43,12 @@ try:
     # for the list datatype read operations, by getting the element with rank 1
     # multiple times in the same transaction
     ops = [
-        list_operations.list_get_by_rank("l", 1, aerospike.LIST_RETURN_VALUE),
-        list_operations.list_get_by_rank("l", 1, aerospike.LIST_RETURN_INDEX),
-        list_operations.list_get_by_rank("l", 1, aerospike.LIST_RETURN_REVERSE_INDEX),
-        list_operations.list_get_by_rank("l", 1, aerospike.LIST_RETURN_RANK),
-        list_operations.list_get_by_rank("l", 1, aerospike.LIST_RETURN_REVERSE_RANK),
-        list_operations.list_get_by_rank("l", 1, aerospike.LIST_RETURN_COUNT),
+        listops.list_get_by_rank("l", 1, aerospike.LIST_RETURN_VALUE),
+        listops.list_get_by_rank("l", 1, aerospike.LIST_RETURN_INDEX),
+        listops.list_get_by_rank("l", 1, aerospike.LIST_RETURN_REVERSE_INDEX),
+        listops.list_get_by_rank("l", 1, aerospike.LIST_RETURN_RANK),
+        listops.list_get_by_rank("l", 1, aerospike.LIST_RETURN_REVERSE_RANK),
+        listops.list_get_by_rank("l", 1, aerospike.LIST_RETURN_COUNT),
     ]
     key, metadata, bins = client.operate_ordered(key, ops)
     # in the python client the operate() command returns the result of the last
@@ -75,8 +76,8 @@ try:
     # get the element with rank -2LUE (second highest) and also append a new
     # element to the end of the list
     ops = [
-        list_operations.list_get_by_rank("l", -2, aerospike.LIST_RETURN_VALUE),
-        list_operations.list_append("l", [1, 3, 3, 7]),
+        listops.list_get_by_rank("l", -2, aerospike.LIST_RETURN_VALUE),
+        listops.list_append("l", [1, 3, 3, 7]),
         operations.read("l"),
     ]
 
@@ -93,16 +94,16 @@ try:
     # also find the reverse index position of an element with the same rank
     ctx = [cdt_ctx.cdt_ctx_list_index(-1)]
     ops = [
-        list_operations.list_get_by_rank("l", 1, aerospike.LIST_RETURN_INDEX, ctx),
-        list_operations.list_get_by_rank(
-            "l", 1, aerospike.LIST_RETURN_REVERSE_INDEX, ctx
-        ),
+        listops.list_get_by_rank("l", 1, aerospike.LIST_RETURN_INDEX, ctx),
+        listops.list_get_by_rank("l", 1, aerospike.LIST_RETURN_REVERSE_INDEX, ctx),
     ]
     key, metadata, bins = client.operate_ordered(key, ops)
     print("\nget_by_rank('l', 1, INDEX, BY_LIST_INDEX(-1)): {}".format(bins[0][1]))
     # get_by_rank('l', 1, INDEX, BY_LIST_INDEX(-1)): 1
     # 1, which is the position of the first appearance of the value 3
-    print("get_by_rank('l', 1, REVERSE_INDEX, BY_LIST_INDEX(-1)): {}".format(bins[1][1]))
+    print(
+        "get_by_rank('l', 1, REVERSE_INDEX, BY_LIST_INDEX(-1)): {}".format(bins[1][1])
+    )
     # get_by_rank('l', 1, REVERSE_INDEX, BY_LIST_INDEX(-1)): 2
     # 2, which is the position of the first appearance of the value 3 when
     # searched from the end to the left (reverse index, AKA -2)
@@ -111,8 +112,7 @@ try:
     # for all the list elements
     try:
         key, metadata, bins = client.operate(
-            key,
-            [list_operations.list_get_by_rank("l", 11, aerospike.LIST_RETURN_VALUE)],
+            key, [listops.list_get_by_rank("l", 11, aerospike.LIST_RETURN_VALUE)]
         )
         print("\n{}".format(bins["l"]))
     except ex.OpNotApplicable as e:
@@ -121,9 +121,9 @@ try:
 
     # turn the list into an ordered list, then get the elements at rank 1, -1
     ops = [
-        list_operations.list_set_order("l", aerospike.LIST_ORDERED),
-        list_operations.list_get_by_rank("l", 1, aerospike.LIST_RETURN_INDEX),
-        list_operations.list_get_by_rank("l", -1, aerospike.LIST_RETURN_INDEX),
+        listops.list_set_order("l", aerospike.LIST_ORDERED),
+        listops.list_get_by_rank("l", 1, aerospike.LIST_RETURN_INDEX),
+        listops.list_get_by_rank("l", -1, aerospike.LIST_RETURN_INDEX),
     ]
     key, metadata, bins = client.operate_ordered(key, ops)
     print("\nset_order('l', ORDERED)")

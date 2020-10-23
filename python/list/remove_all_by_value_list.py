@@ -3,7 +3,7 @@ from args import options
 import aerospike
 from aerospike import exception as ex
 from aerospike_helpers import cdt_ctx
-from aerospike_helpers.operations import list_operations
+from aerospike_helpers.operations import list_operations as listops
 from aerospike_helpers.operations import operations
 import sys
 
@@ -15,6 +15,7 @@ config = {
     "policies": {
         "operate": {"key": aerospike.POLICY_KEY_SEND},
         "read": {"key": aerospike.POLICY_KEY_SEND},
+        "write": {"key": aerospike.POLICY_KEY_SEND},
     },
 }
 try:
@@ -37,7 +38,7 @@ try:
     ops = [
         operations.write("l", sample),
         operations.read("l"),
-        list_operations.list_remove_by_value_list(
+        listops.list_remove_by_value_list(
             "l", [2, 3], aerospike.LIST_RETURN_VALUE
         ),
     ]
@@ -54,7 +55,7 @@ try:
     ops = [
         operations.write("l", sample),
         operations.read("l"),
-        list_operations.list_remove_by_value_list(
+        listops.list_remove_by_value_list(
             "l", [2, 3], aerospike.LIST_RETURN_INDEX
         ),
     ]
@@ -71,7 +72,7 @@ try:
     ops = [
         operations.write("l", sample),
         operations.read("l"),
-        list_operations.list_remove_by_value_list(
+        listops.list_remove_by_value_list(
             "l", [2, 3], aerospike.LIST_RETURN_REVERSE_INDEX
         ),
     ]
@@ -88,7 +89,7 @@ try:
     ops = [
         operations.write("l", sample),
         operations.read("l"),
-        list_operations.list_remove_by_value_list(
+        listops.list_remove_by_value_list(
             "l", [2, 3], aerospike.LIST_RETURN_RANK
         ),
     ]
@@ -105,7 +106,7 @@ try:
     ops = [
         operations.write("l", sample),
         operations.read("l"),
-        list_operations.list_remove_by_value_list(
+        listops.list_remove_by_value_list(
             "l", [2, 3], aerospike.LIST_RETURN_REVERSE_RANK
         ),
     ]
@@ -122,7 +123,7 @@ try:
     ops = [
         operations.write("l", sample),
         operations.read("l"),
-        list_operations.list_remove_by_value_list(
+        listops.list_remove_by_value_list(
             "l", [2, 3], aerospike.LIST_RETURN_COUNT
         ),
     ]
@@ -138,7 +139,7 @@ try:
     # reset the list value, try the NONE return type
     ops = [
         operations.write("l", sample),
-        list_operations.list_remove_by_value_list(
+        listops.list_remove_by_value_list(
             "l", [2, 3], aerospike.LIST_RETURN_NONE
         ),
         operations.read("l"),
@@ -158,10 +159,10 @@ try:
     ops = [
         operations.write("l", tuples),
         operations.read("l"),
-        list_operations.list_remove_by_value_list(
+        listops.list_remove_by_value_list(
             "l", [["v1", wildcard], ["v2", wildcard]], aerospike.LIST_RETURN_VALUE
         ),
-        list_operations.list_remove_by_value_list(
+        listops.list_remove_by_value_list(
             "l", [["z"]], aerospike.LIST_RETURN_COUNT
         ),
         operations.read("l"),

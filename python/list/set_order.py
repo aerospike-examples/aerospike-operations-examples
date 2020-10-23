@@ -3,7 +3,7 @@ from args import options
 import aerospike
 from aerospike import exception as ex
 from aerospike_helpers import cdt_ctx
-from aerospike_helpers.operations import list_operations
+from aerospike_helpers.operations import list_operations as listops
 import sys
 
 if options.set == "None":
@@ -14,6 +14,7 @@ config = {
     "policies": {
         "operate": {"key": aerospike.POLICY_KEY_SEND},
         "read": {"key": aerospike.POLICY_KEY_SEND},
+        "write": {"key": aerospike.POLICY_KEY_SEND},
     },
 }
 try:
@@ -39,7 +40,7 @@ try:
     # set the inner list (at index 5) to ORDERED
     ctx = [cdt_ctx.cdt_ctx_list_index(5)]
     client.operate(
-        key, [list_operations.list_set_order("l", aerospike.LIST_ORDERED, ctx)]
+        key, [listops.list_set_order("l", aerospike.LIST_ORDERED, ctx)]
     )
     key, metadata, bins = client.get(key)
     print("\nset_order('l', ORDERED, BY_LIST_INDEX(5))\n{}".format(bins["l"]))
@@ -47,7 +48,7 @@ try:
     # [4, 5, 8, 1, 2, [2, 3], 9, 6]
 
     # set the outer list to ORDERED
-    client.operate(key, [list_operations.list_set_order("l", aerospike.LIST_ORDERED)])
+    client.operate(key, [listops.list_set_order("l", aerospike.LIST_ORDERED)])
     key, metadata, bins = client.get(key)
     print("\nset_order('l', ORDERED)\n{} ".format(bins["l"]))
     # [1, 2, 4, 5, 6, 8, 9, [2, 3]]

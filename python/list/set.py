@@ -3,7 +3,7 @@ from args import options
 import aerospike
 from aerospike import exception as ex
 from aerospike_helpers import cdt_ctx
-from aerospike_helpers.operations import list_operations
+from aerospike_helpers.operations import list_operations as listops
 import sys
 
 if options.set == "None":
@@ -14,6 +14,7 @@ config = {
     "policies": {
         "operate": {"key": aerospike.POLICY_KEY_SEND},
         "read": {"key": aerospike.POLICY_KEY_SEND},
+        "write": {"key": aerospike.POLICY_KEY_SEND},
     },
 }
 try:
@@ -33,7 +34,7 @@ try:
     # create a new record with one element by upsert
     # a list created using set will be unordered, regardless of the list order
     # policy
-    ret = client.operate(key, [list_operations.list_set("l", 1, "b")])
+    ret = client.operate(key, [listops.list_set("l", 1, "b")])
     key, metadata, bins = client.get(key)
     print("set('l', 1, 'b'): {}".format(bins["l"]))
     # set('l', 1, 'b'): [None, 'b'] - Aerospike NIL represented as a Python None instance
@@ -45,7 +46,7 @@ try:
         "write_flags": aerospike.LIST_WRITE_INSERT_BOUNDED
         | aerospike.LIST_WRITE_NO_FAIL
     }
-    ret = client.operate(key, [list_operations.list_set("l", 2, "c", policy)])
+    ret = client.operate(key, [listops.list_set("l", 2, "c", policy)])
     key, metadata, bins = client.get(key)
     print("\nset('l', 2, 'c', INSERT_BOUNDED|NO_FAIL): {}".format(bins["l"]))
     # set('l', 2, 'c', INSERT_BOUNDED|NO_FAIL): [None, 'b', 'c']
@@ -55,7 +56,7 @@ try:
     policy = {"write_flags": aerospike.LIST_WRITE_ADD_UNIQUE}
     try:
         print("\nset('l', 3, 'b', ADD_UNIQUE)")
-        ret = client.operate(key, [list_operations.list_set("l", 3, "b", policy)])
+        ret = client.operate(key, [listops.list_set("l", 3, "b", policy)])
     except ex.ElementExistsError as e:
         print("Error: {0} [{1}]".format(e.msg, e.code))
         # Error: AEROSPIKE_ERR_FAIL_ELEMENT_EXISTS [24]
@@ -67,21 +68,21 @@ try:
         "write_flags": aerospike.LIST_WRITE_INSERT_BOUNDED
         | aerospike.LIST_WRITE_NO_FAIL
     }
-    ret = client.operate(key, [list_operations.list_set("l", 4, "e", policy)])
+    ret = client.operate(key, [listops.list_set("l", 4, "e", policy)])
     print("\nSet outside the list boundaries with INSERT_BOUNDED failed gracefully")
     print("set('l', 4, 'e', INSERT_BOUNDED|NO_FAIL)")
 
     # set an element outside the boundary of the current list
     # with no INSERT_BOUNDED
     # this should work
-    ret = client.operate(key, [list_operations.list_set("l", 4, [])])
+    ret = client.operate(key, [listops.list_set("l", 4, [])])
     key, metadata, bins = client.get(key)
     print("\nset('l', 4, []): {}".format(bins["l"]))
     # set('l', 4, []): [None, 'b', 'c', None, []]
 
     # set a list element at index 4 of the current list
     ctx = [cdt_ctx.cdt_ctx_list_index(4)]
-    ret = client.operate(key, [list_operations.list_set("l", 0, "e", ctx=ctx)])
+    ret = client.operate(key, [listops.list_set("l", 0, "e", ctx=ctx)])
     key, metadata, bins = client.get(key)
     print("\nset('l', 0, 'e', BY_LIST_INDEX(4)): {}".format(bins["l"]))
     # set('l', 0, 'e', BY_LIST_INDEX(4)): [None, 'b', 'c', None, ['e']]
@@ -89,8 +90,8 @@ try:
     # set cannot be used on ordered lists
     # change the list order and try to insert
     ops = [
-        list_operations.list_set_order("l", aerospike.LIST_ORDERED),
-        list_operations.list_set("l", 2, "z"),
+        listops.list_set_order("l", aerospike.LIST_ORDERED),
+        listops.list_set("l", 2, "z"),
     ]
     try:
         print("\nset_order('l', ORDERED)")

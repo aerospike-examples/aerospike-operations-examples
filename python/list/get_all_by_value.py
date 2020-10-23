@@ -3,7 +3,7 @@ from args import options
 import aerospike
 from aerospike import exception as ex
 from aerospike_helpers import cdt_ctx
-from aerospike_helpers.operations import list_operations
+from aerospike_helpers.operations import list_operations as listops
 from aerospike_helpers.operations import operations
 import sys
 
@@ -15,6 +15,7 @@ config = {
     "policies": {
         "operate": {"key": aerospike.POLICY_KEY_SEND},
         "read": {"key": aerospike.POLICY_KEY_SEND},
+        "write": {"key": aerospike.POLICY_KEY_SEND},
     },
 }
 try:
@@ -42,12 +43,12 @@ try:
     # list data type read operations, by getting all elements with value 2
     # from list multiple times in the same transaction
     ops = [
-        list_operations.list_get_by_value("l", 2, aerospike.LIST_RETURN_VALUE),
-        list_operations.list_get_by_value("l", 2, aerospike.LIST_RETURN_INDEX),
-        list_operations.list_get_by_value("l", 2, aerospike.LIST_RETURN_REVERSE_INDEX),
-        list_operations.list_get_by_value("l", 2, aerospike.LIST_RETURN_RANK),
-        list_operations.list_get_by_value("l", 2, aerospike.LIST_RETURN_REVERSE_RANK),
-        list_operations.list_get_by_value("l", 2, aerospike.LIST_RETURN_COUNT),
+        listops.list_get_by_value("l", 2, aerospike.LIST_RETURN_VALUE),
+        listops.list_get_by_value("l", 2, aerospike.LIST_RETURN_INDEX),
+        listops.list_get_by_value("l", 2, aerospike.LIST_RETURN_REVERSE_INDEX),
+        listops.list_get_by_value("l", 2, aerospike.LIST_RETURN_RANK),
+        listops.list_get_by_value("l", 2, aerospike.LIST_RETURN_REVERSE_RANK),
+        listops.list_get_by_value("l", 2, aerospike.LIST_RETURN_COUNT),
     ]
     key, metadata, bins = client.operate_ordered(key, ops)
     # in the python client the operate() command returns the result of the last
@@ -72,20 +73,20 @@ try:
     ops = [
         operations.write("l", tuples),
         operations.read("l"),
-        list_operations.list_get_by_value("l", ["v1", 2], aerospike.LIST_RETURN_INDEX),
-        list_operations.list_get_by_value(
+        listops.list_get_by_value("l", ["v1", 2], aerospike.LIST_RETURN_INDEX),
+        listops.list_get_by_value(
             "l", ["v1", wildcard], aerospike.LIST_RETURN_VALUE
         ),
-        list_operations.list_get_by_value(
+        listops.list_get_by_value(
             "l", ["v1", wildcard], aerospike.LIST_RETURN_VALUE, inverted=True
         ),
-        list_operations.list_get_by_value(
+        listops.list_get_by_value(
             "l", ["v1", 3, wildcard], aerospike.LIST_RETURN_VALUE
         ),
-        list_operations.list_get_by_value(
+        listops.list_get_by_value(
             "l", [wildcard, 2], aerospike.LIST_RETURN_VALUE
         ),
-        list_operations.list_get_by_value("l", ["z"], aerospike.LIST_RETURN_COUNT),
+        listops.list_get_by_value("l", ["z"], aerospike.LIST_RETURN_COUNT),
     ]
     key, metadata, bins = client.operate_ordered(key, ops)
     print("\nread('l'): {})".format(bins[0][1]))

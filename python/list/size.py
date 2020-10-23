@@ -3,7 +3,7 @@ from args import options
 import aerospike
 from aerospike import exception as ex
 from aerospike_helpers import cdt_ctx
-from aerospike_helpers.operations import list_operations
+from aerospike_helpers.operations import list_operations as listops
 import sys
 
 if options.set == "None":
@@ -14,6 +14,7 @@ config = {
     "policies": {
         "operate": {"key": aerospike.POLICY_KEY_SEND},
         "read": {"key": aerospike.POLICY_KEY_SEND},
+        "write": {"key": aerospike.POLICY_KEY_SEND},
     },
 }
 try:
@@ -36,13 +37,13 @@ try:
     print("{}".format(bins["l"]))
     # [1, 2, [3, 4]]
 
-    key, metadata, bins = client.operate(key, [list_operations.list_size("l")])
+    key, metadata, bins = client.operate(key, [listops.list_size("l")])
     print("\nsize('l'): {}".format(bins["l"]))
     # The size of the list is 3
 
     # get the size of the inner list (at index 2)
     ctx = [cdt_ctx.cdt_ctx_list_index(2)]
-    key, metadata, bins = client.operate(key, [list_operations.list_size("l", ctx=ctx)])
+    key, metadata, bins = client.operate(key, [listops.list_size("l", ctx=ctx)])
     print("\nsize('l', BY_LIST_INDEX(4)): {}".format(bins["l"]))
     # The size of the sub-list is 2
 except ex.ClientError as e:

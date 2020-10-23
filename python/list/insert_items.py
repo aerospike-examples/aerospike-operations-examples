@@ -3,7 +3,7 @@ from args import options
 import aerospike
 from aerospike import exception as ex
 from aerospike_helpers import cdt_ctx
-from aerospike_helpers.operations import list_operations
+from aerospike_helpers.operations import list_operations listops
 import sys
 
 if options.set == "None":
@@ -14,6 +14,7 @@ config = {
     "policies": {
         "operate": {"key": aerospike.POLICY_KEY_SEND},
         "read": {"key": aerospike.POLICY_KEY_SEND},
+        "write": {"key": aerospike.POLICY_KEY_SEND},
     },
 }
 try:
@@ -32,7 +33,7 @@ try:
     print("\ninsert_items(bin, index, items[, writeFlags, context])\n")
     # create a new record by upsert
     # by default a newly created list is unordered
-    client.operate(key, [list_operations.list_insert_items("l", 1, ["a", "e"])])
+    client.operate(key, [listops.list_insert_items("l", 1, ["a", "e"])])
     key, metadata, bins = client.get(key)
     print("insert_items('l', 1, ['a', 'e'])")
     # insert_items('l', 1, ['a', 'e'])
@@ -40,7 +41,7 @@ try:
     # [None, 'a', 'e'] - Aerospike NIL represented as an instance of Python None
 
     # insert other elements into the existing list
-    client.operate(key, [list_operations.list_insert_items("l", 2, ["b", "c"])])
+    client.operate(key, [listops.list_insert_items("l", 2, ["b", "c"])])
     print("\ninsert_items('l', 2, ['b', 'c'])")
     key, metadata, bins = client.get(key)
     print("{}".format(bins["l"]))
@@ -56,7 +57,7 @@ try:
         "list_order": aerospike.LIST_UNORDERED,
     }
     client.operate(
-        key, [list_operations.list_insert_items("l", 4, ["a", "d", "e"], policy)]
+        key, [listops.list_insert_items("l", 4, ["a", "d", "e"], policy)]
     )
     print("\ninsert_items('l', 4, ['a', 'd', 'e'], ADD_UNIQUE|NO_FAIL|PARTIAL)")
     key, metadata, bins = client.get(key)
@@ -70,7 +71,7 @@ try:
         "write_flags": aerospike.LIST_WRITE_INSERT_BOUNDED
         | aerospike.LIST_WRITE_NO_FAIL
     }
-    client.operate(key, [list_operations.list_insert_items("l", 6, ["f", "g"], policy)])
+    client.operate(key, [listops.list_insert_items("l", 6, ["f", "g"], policy)])
     key, metadata, bins = client.get(key)
     print("\ninsert_items('l', 6, ['f', 'g'], INSERT_BOUNDED|NO_FAIL)")
     print("{}".format(bins["l"]))
@@ -83,12 +84,12 @@ try:
         "write_flags": aerospike.LIST_WRITE_INSERT_BOUNDED
         | aerospike.LIST_WRITE_NO_FAIL
     }
-    client.operate(key, [list_operations.list_insert_items("l", 9, ["i", "j"], policy)])
+    client.operate(key, [listops.list_insert_items("l", 9, ["i", "j"], policy)])
     print("\ninsert_items('l', 9, ['i', 'j'], INSERT_BOUNDED|NO_FAIL)")
 
     # insert an element outside the boundary of the current list
     # with no INSERT_BOUNDED. this should work
-    client.operate(key, [list_operations.list_insert_items("l", 9, [[]])])
+    client.operate(key, [listops.list_insert_items("l", 9, [[]])])
     print("\ninsert_items('l', 9, [[]])")
     key, metadata, bins = client.get(key)
     print("{}".format(bins["l"]))
@@ -97,7 +98,7 @@ try:
     # insert items into the list element at index 9 of the current list
     ctx = [cdt_ctx.cdt_ctx_list_index(9)]
     ret = client.operate(
-        key, [list_operations.list_insert_items("l", 0, ["i", "j"], ctx=ctx)]
+        key, [listops.list_insert_items("l", 0, ["i", "j"], ctx=ctx)]
     )
     print("\ninsert_items('l', 0, ['i', 'j'], ctx=BY_LIST_INDEX(9))")
     key, metadata, bins = client.get(key)
@@ -110,7 +111,7 @@ try:
     try:
         print("\ninsert_items('l', 3, ['b', 'z'], ADD_UNIQUE)")
         ret = client.operate(
-            key, [list_operations.list_insert_items("l", 3, ["b", "z"], policy)]
+            key, [listops.list_insert_items("l", 3, ["b", "z"], policy)]
         )
     except ex.ElementExistsError as e:
         print("Error: {0} [{1}]".format(e.msg, e.code))
@@ -118,8 +119,8 @@ try:
 
     # insert cannot be used on ordered lists
     ops = [
-        list_operations.list_set_order("l", aerospike.LIST_ORDERED),
-        list_operations.list_insert_items("l", 2, ["z"]),
+        listops.list_set_order("l", aerospike.LIST_ORDERED),
+        listops.list_insert_items("l", 2, ["z"]),
     ]
     try:
         print("\nset_order('l', ORDERED)")

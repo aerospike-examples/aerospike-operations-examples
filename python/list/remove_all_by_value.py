@@ -3,7 +3,7 @@ from args import options
 import aerospike
 from aerospike import exception as ex
 from aerospike_helpers import cdt_ctx
-from aerospike_helpers.operations import list_operations
+from aerospike_helpers.operations import list_operations as listops
 from aerospike_helpers.operations import operations
 import sys
 
@@ -15,6 +15,7 @@ config = {
     "policies": {
         "operate": {"key": aerospike.POLICY_KEY_SEND},
         "read": {"key": aerospike.POLICY_KEY_SEND},
+        "write": {"key": aerospike.POLICY_KEY_SEND},
     },
 }
 try:
@@ -37,7 +38,7 @@ try:
     ops = [
         operations.write("l", sample),
         operations.read("l"),
-        list_operations.list_remove_by_value("l", 3, aerospike.LIST_RETURN_VALUE),
+        listops.list_remove_by_value("l", 3, aerospike.LIST_RETURN_VALUE),
     ]
     key, metadata, bins = client.operate_ordered(key, ops)
     print("{}\nremove_all_by_value('l', 3, VALUE): {}".format(bins[0][1], bins[1][1]))
@@ -48,7 +49,7 @@ try:
     ops = [
         operations.write("l", sample),
         operations.read("l"),
-        list_operations.list_remove_by_value("l", 3, aerospike.LIST_RETURN_INDEX),
+        listops.list_remove_by_value("l", 3, aerospike.LIST_RETURN_INDEX),
     ]
     key, metadata, bins = client.operate_ordered(key, ops)
     print("\n{}\nremove_all_by_value('l', 3, INDEX): {}".format(bins[0][1], bins[1][1]))
@@ -59,7 +60,7 @@ try:
     ops = [
         operations.write("l", sample),
         operations.read("l"),
-        list_operations.list_remove_by_value(
+        listops.list_remove_by_value(
             "l", 3, aerospike.LIST_RETURN_REVERSE_INDEX
         ),
     ]
@@ -76,7 +77,7 @@ try:
     ops = [
         operations.write("l", sample),
         operations.read("l"),
-        list_operations.list_remove_by_value("l", 3, aerospike.LIST_RETURN_RANK),
+        listops.list_remove_by_value("l", 3, aerospike.LIST_RETURN_RANK),
     ]
     key, metadata, bins = client.operate_ordered(key, ops)
     print("\n{}\nremove_all_by_value('l', 3, RANK): {}".format(bins[0][1], bins[1][1]))
@@ -87,7 +88,7 @@ try:
     ops = [
         operations.write("l", sample),
         operations.read("l"),
-        list_operations.list_remove_by_value(
+        listops.list_remove_by_value(
             "l", 3, aerospike.LIST_RETURN_REVERSE_RANK
         ),
     ]
@@ -104,7 +105,7 @@ try:
     ops = [
         operations.write("l", sample),
         operations.read("l"),
-        list_operations.list_remove_by_value("l", 3, aerospike.LIST_RETURN_COUNT),
+        listops.list_remove_by_value("l", 3, aerospike.LIST_RETURN_COUNT),
     ]
     key, metadata, bins = client.operate_ordered(key, ops)
     print("\n{}\nremove_all_by_value('l', 3, COUNT): {}".format(bins[0][1], bins[1][1]))
@@ -114,7 +115,7 @@ try:
     # reset the list value, try the NONE return type
     ops = [
         operations.write("l", sample),
-        list_operations.list_remove_by_value("l", 3, aerospike.LIST_RETURN_NONE),
+        listops.list_remove_by_value("l", 3, aerospike.LIST_RETURN_NONE),
         operations.read("l"),
     ]
     key, metadata, bins = client.operate(key, ops)
@@ -132,10 +133,10 @@ try:
     ops = [
         operations.write("l", tuples),
         operations.read("l"),
-        list_operations.list_remove_by_value(
+        listops.list_remove_by_value(
             "l", ["v2", wildcard], aerospike.LIST_RETURN_VALUE
         ),
-        list_operations.list_remove_by_value("l", ["z"], aerospike.LIST_RETURN_COUNT),
+        listops.list_remove_by_value("l", ["z"], aerospike.LIST_RETURN_COUNT),
         operations.read("l"),
     ]
     key, metadata, bins = client.operate_ordered(key, ops)

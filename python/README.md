@@ -21,3 +21,7 @@ the code examples for each method name documented on https://docs.aerospike.com
 So, examples for `List get_all_by_value` live in `list/get_all_by_value.py`,
 while the corresponding Python client method is
 `list_operations.list_get_by_value`.
+
+Operations
+==========
+ * [List operations](list/)
